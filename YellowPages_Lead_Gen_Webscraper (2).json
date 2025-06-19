@@ -1,0 +1,1280 @@
+{
+  "name": "YellowPages Lead Gen Webscraper",
+  "nodes": [
+    {
+      "parameters": {
+        "url": "={{ $('Google Sheets Trigger').item.json['Paste URL Below'] }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json['User-Agent'] }}"
+            },
+            {
+              "name": "Accept",
+              "value": "={{ $json.Accept }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json['Accept-Language'] }}"
+            },
+            {
+              "name": "Referer",
+              "value": "={{ $json.Referer }}"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "={{ $json['Accept-Encoding'] }}"
+            },
+            {
+              "name": "Connection",
+              "value": "={{ $json.Connection }}"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "={{ $json['Upgrade-Insecure-Requests'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "={{ $json['Sec-Fetch-Dest'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "={{ $json['Sec-Fetch-Mode'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "={{ $json['Sec-Fetch-Site'] }}"
+            },
+            {
+              "name": "Sec-Fetch-User",
+              "value": "={{ $json['Sec-Fetch-User'] }}"
+            },
+            {
+              "name": "DNT",
+              "value": "={{ $json.DNT }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -2200,
+        200
+      ],
+      "id": "eee679d7-7d68-47cd-98e1-46582548846c",
+      "name": "Enter YellowPages.ca",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3040,
+        160
+      ],
+      "id": "6b7c2371-a32b-43cd-a086-85150edd1328",
+      "name": "When clicking ‘Test workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "{{\n  const headersList = [\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.5\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://www.google.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"none\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.9\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://bing.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.7\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://duckduckgo.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"none\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.8\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://search.brave.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.6\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://yahoo.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  }\n];\n\n\n\n  const randomHeader = headersList[Math.floor(Math.random() * headersList.length)];\n\n  return randomHeader;\n}}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -2420,
+        200
+      ],
+      "id": "0b44b193-9fac-48d4-871d-db3ef5ad7ef4",
+      "name": "Random Header"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get items from the \"Enter YellowPages.ca\" node\nconst YPnodeItems = $items('Enter YellowPages.ca Company List');\n\n// Extract HTML from .json.data field of each item\nconst fullHtml = YPnodeItems.map(i => i.json.data || '').join(' ');\n\n// Clean HTML: remove newlines and extra spaces\nconst cleanHtml = fullHtml.replace(/\\n/g, ' ').replace(/\\s+/g, ' ');\n\n// Regex to capture href values with the specific class\nconst linkRegex = /<a[^>]*class=\"[^\"]*listing__name--link[^\"]*\"[^>]*href=\"([^\"]+)\"/gi;\n\n// Find all matches\nconst matches = [...cleanHtml.matchAll(linkRegex)];\n\n// Map them to return clean URLs\nconst companyLinks = matches.map(m => ({\n  url: m[1].trim()\n}));\n\n// Return the result as output items\nreturn companyLinks;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -220,
+        80
+      ],
+      "id": "024ad1ce-a241-481f-95b9-463ae89f8760",
+      "name": "Get Company Links"
+    },
+    {
+      "parameters": {
+        "jsCode": "{{\n  const html = $items('Enter YellowPages.ca')[0].json.data || \"\";\n\n  // Normalize spaces and line breaks\n  const cleanHtml = html.replace(/\\n/g, ' ').replace(/\\s+/g, ' ');\n\n  // Match current page number from: <span class=\"bold\"> 2 / </span>\n  const currentPageMatch = cleanHtml.match(/<span class=\"bold\">\\s*(\\d+)\\s*\\/\\s*<\\/span>/i);\n\n  // Match max page number from: <span class=\"\"> 45 </span>\n  const maxPageMatch = cleanHtml.match(/<span class=\"pageCount\">.*?<span class=\"bold\">[^<]+<\\/span>\\s*<span class=\"\">\\s*(\\d+)\\s*<\\/span>/i);\n\n  // Extract numbers or set to null\n  const currentPage = currentPageMatch ? parseInt(currentPageMatch[1], 10) : null;\n  const maxPage = maxPageMatch ? parseInt(maxPageMatch[1], 10) : null;\n\n  // Return an array of objects with current page and max page\n  return [\n    {\n      json: {\n        currentPage,\n        maxPage\n      }\n    }\n  ];\n}}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1320,
+        200
+      ],
+      "id": "aa38753b-2b68-483d-92c0-5ed8ad8bfa26",
+      "name": "Get Current and Max Page"
+    },
+    {
+      "parameters": {
+        "jsCode": "{{\nconst YPnodeItems = $items('Enter YellowPages.ca');\n\nconst results = [];\n\nfor (const item of YPnodeItems) {\n  const html = item.json.data || '';\n  const cleanHtml = html.replace(/\\n/g, ' ').replace(/\\s+/g, ' ');\n\n  // Get the full search URL\n  const searchRegex = /content=\"com\\.ypg\\.find:\\/\\/(www\\.yellowpages\\.ca\\/search\\/si\\/\\d+\\/[^\"]+)\"/i;\n  const searchMatch = cleanHtml.match(searchRegex);\n\n  let searchUrl = searchMatch ? searchMatch[1] : null;\n\n  let searchLocation = null;\n  let specificSearch = null;\n\n  if (searchUrl) {\n    // CLEAN the searchUrl to remove trailing \"?=\" if it exists\n    searchUrl = searchUrl.replace(/\\?=$/, '');\n\n    // Extract Search Location\n    const locationMatch = searchUrl.match(/[^/]+\\/([^/]+)$/);\n    if (locationMatch && locationMatch[1]) {\n      searchLocation = decodeURIComponent(locationMatch[1].replace(/\\?=$/, ''));\n    }\n\n    // Extract Specific Search\n    const specificMatch = searchUrl.match(/\\/search\\/si\\/\\d+(\\/[^\"]+)/);\n    if (specificMatch && specificMatch[1]) {\n      specificSearch = decodeURIComponent(specificMatch[1].replace(/\\?=$/, ''));\n    }\n  }\n\n  results.push({\n    json: {\n      searchUrl: searchUrl || 'NOT FOUND',\n      searchLocation: searchLocation || 'NOT FOUND',\n      specificSearch: specificSearch || 'NOT FOUND'\n    }\n  });\n}\n\nreturn results;\n}}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1980,
+        200
+      ],
+      "id": "b6fc395e-ce37-4ad7-b262-cb9f7488cf0e",
+      "name": "Get Search"
+    },
+    {
+      "parameters": {
+        "jsCode": "{{\n  const now = new Date();\n\n  const month = String(now.getMonth() + 1).padStart(2, '0'); // getMonth() is 0-based\n  const day = String(now.getDate()).padStart(2, '0');\n  const year = now.getFullYear();\n\n  const formattedDate = `${month}/${day}/${year}`;\n\n  return [\n    {\n      json: {\n        currentDate: formattedDate\n      }\n    }\n  ];\n}}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1760,
+        200
+      ],
+      "id": "bdbfd85a-76d4-43ff-ab49-18d3bb93df9b",
+      "name": "Get Current Date"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * (12 - 5 + 1)) + 5 }}\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        660,
+        0
+      ],
+      "id": "9861adb9-b7ca-4b34-a0f2-b641839027ea",
+      "name": "Wait",
+      "webhookId": "f10b0f5c-02ce-49db-ac2a-6e4264df8bea"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure data from each node exists\nconst GetHeader = $items('Random Header')[0] || {};  // Use empty object if node is missing\nconst GetSearch = $items('Get Search')[0] || {};  // Use empty object if node is missing\nconst getPageNum = $items('Loop Over Items1')[0] || {};  // Directly access first value or fallback to empty object\n\nconst GetSheetName = $items('Set Variable for Sheets')[0] || {};\n$input.first().json.page\n// Return values directly\nreturn {\n  json: {\n    Header: GetHeader.json || {},  // Ensure it's always an object\n    Search: GetSearch.json || {},\n    PageNum: getPageNum.json || {},\n    SheetName: GetSheetName.json || {}// Directly return the first value\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -660,
+        80
+      ],
+      "id": "7e587d73-bfd6-41c7-a7c0-650c16613477",
+      "name": "Get Previous Nodes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = String($items('Get Search')[0]?.json?.specificSearch || '').toLowerCase();\nlet category = '';\n\nif (input.includes('forest')) {\n  category = 'Forestry';\n} else if (input.includes('civil works') || input.includes('civil') || input.includes('road') || input.includes('building')) {\n  category = 'Civil Works';\n} else if (input.includes('mine') || input.includes('mining')) {\n  category = 'Mining';\n} else if (input.includes('excavat') || input.includes('excavation')) {\n  category = 'Excavation';\n} else if (input.includes('logging')) {\n  category = 'Logging';\n} else if (input.includes('pipeline') || input.includes('oil+field')) {\n  category = 'Pipeline Laying';\n} else if (input.includes('construction') || input.includes('development construct')) {\n  category = 'Development - Construction';\n} else {\n  category = 'Uncategorized'; // fallback value\n}\n\nreturn {\n  json: {\n    category\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1540,
+        200
+      ],
+      "id": "d4188710-4251-4122-846b-85100dc14981",
+      "name": "Set Variable for Sheets"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.yellowpages.ca/search/si/{{ $('Loop Over Items1').item.json.page }}{{ $json.Search.specificSearch }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.Header['User-Agent'] }}"
+            },
+            {
+              "name": "Accept",
+              "value": "={{ $json.Header.Accept }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.Header['Accept-Language'] }}"
+            },
+            {
+              "name": "Referer",
+              "value": "={{ $json.Header.Referer }}"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "={{ $json.Header['Accept-Encoding'] }}"
+            },
+            {
+              "name": "Connection",
+              "value": "={{ $json.Header.Connection }}"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "={{ $json.Header['Upgrade-Insecure-Requests'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "={{ $json.Header['Sec-Fetch-Dest'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "={{ $json.Header['Sec-Fetch-Mode'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "={{ $json.Header['Sec-Fetch-Site'] }}"
+            },
+            {
+              "name": "Sec-Fetch-User",
+              "value": "={{ $json.Header['Sec-Fetch-User'] }}"
+            },
+            {
+              "name": "DNT",
+              "value": "={{ $json.Header.DNT }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -440,
+        80
+      ],
+      "id": "009de993-4ad3-4862-9a3a-9ec46408990c",
+      "name": "Enter YellowPages.ca Company List",
+      "retryOnFail": true,
+      "maxTries": 5
+    },
+    {
+      "parameters": {
+        "jsCode": "// Ensure data from each node exists\nconst GetHeader = $items('Random Header 2')[0] || {};  // Use empty object if node is missing\nconst GetSearch = $items('Get Search')[0] || {};  // Use empty object if node is missing\n\nconst GetSheetName = $items('Set Variable for Sheets')[0] || {};\n\n// Return values directly\nreturn {\n  json: {\n    Header: GetHeader.json || {},  // Ensure it's always an object\n    Search: GetSearch.json || {},\n    SheetName: GetSheetName.json || {}// Directly return the first value\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ],
+      "id": "6716c13e-a298-43df-b49d-499a9509d66c",
+      "name": "Get Previous Nodes (HEADER)"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.yellowpages.ca{{ $('Loop Over Items').item.json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "User-Agent",
+              "value": "={{ $json.Header['User-Agent'] }}"
+            },
+            {
+              "name": "Accept",
+              "value": "={{ $json.Header.Accept }}"
+            },
+            {
+              "name": "Accept-Language",
+              "value": "={{ $json.Header['Accept-Language'] }}"
+            },
+            {
+              "name": "Referer",
+              "value": "={{ $json.Header.Referer }}"
+            },
+            {
+              "name": "Accept-Encoding",
+              "value": "={{ $json.Header['Accept-Encoding'] }}"
+            },
+            {
+              "name": "Connection",
+              "value": "={{ $json.Header.Connection }}"
+            },
+            {
+              "name": "Upgrade-Insecure-Requests",
+              "value": "={{ $json.Header['Upgrade-Insecure-Requests'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Dest",
+              "value": "={{ $json.Header['Sec-Fetch-Dest'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Mode",
+              "value": "={{ $json.Header['Sec-Fetch-Mode'] }}"
+            },
+            {
+              "name": "Sec-Fetch-Site",
+              "value": "={{ $json.Header['Sec-Fetch-Site'] }}"
+            },
+            {
+              "name": "Sec-Fetch-User",
+              "value": "={{ $json.Header['Sec-Fetch-User'] }}"
+            },
+            {
+              "name": "DNT",
+              "value": "={{ $json.Header.DNT }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        0
+      ],
+      "id": "c0b523f6-cf62-4955-b068-d470ab1d6e40",
+      "name": "Company Specific Links",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "waitBetweenTries": 3000
+    },
+    {
+      "parameters": {
+        "jsCode": "{{\n  const headersList = [\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.5\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://www.google.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"none\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.1 Safari/605.1.15\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.9\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://bing.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.7\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://duckduckgo.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"none\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.8\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://search.brave.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  },\n  {\n    \"User-Agent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:125.0) Gecko/20100101 Firefox/125.0\",\n    \"Accept\": \"text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8\",\n    \"Accept-Language\": \"en-US,en;q=0.6\",\n    \"Accept-Encoding\": \"gzip, deflate, br\",\n    \"Connection\": \"keep-alive\",\n    \"Referer\": \"https://yahoo.com\",\n    \"Upgrade-Insecure-Requests\": \"1\",\n    \"Sec-Fetch-Dest\": \"document\",\n    \"Sec-Fetch-Mode\": \"navigate\",\n    \"Sec-Fetch-Site\": \"cross-site\",\n    \"Sec-Fetch-User\": \"?1\",\n    \"DNT\": \"1\"\n  }\n];\n\n\n\n  const randomHeader = headersList[Math.floor(Math.random() * headersList.length)];\n\n  return randomHeader;\n}}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "b75280d2-d901-4311-8d8d-b56bb81c2e78",
+      "name": "Random Header 2"
+    },
+    {
+      "parameters": {
+        "jsCode": "const html = $input.first().json.data || \"\";\nconst match = html.match(/<span[^>]*class=\"[^\"]*merchantName[^\"]*\"[^>]*>([^<]+)<\\/span>/i);\n\n// Simple HTML entity decoder for common cases\nfunction decodeHTMLEntities(str) {\n  return str\n    .replace(/&amp;/g, '&')\n    .replace(/&lt;/g, '<')\n    .replace(/&gt;/g, '>')\n    .replace(/&quot;/g, '\"')\n    .replace(/&#39;/g, \"'\")\n    .replace(/&#x2F;/g, '/');\n}\n\nconst companyNameRaw = match ? match[1].trim() : null;\nconst companyName = companyNameRaw ? decodeHTMLEntities(companyNameRaw) : null;\n\nreturn {\n  json: {\n    companyName\n  }\n};\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        0
+      ],
+      "id": "c7e5536e-6e07-49b6-9dbc-f22535638f04",
+      "name": "Get Company Name"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "0e30614f-f626-4c4f-9adc-c9cda62cb73b",
+              "leftValue": "={{ $json['Company Name'] }}",
+              "rightValue": "={{ $('Get Company Name').item.json.companyName }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "2bff5461-e9dc-4acf-9093-c8f849d61b82",
+              "leftValue": "={{ $json['Company Name'] ? $json['Company Name'].replace(/&amp;/g, '&') : '' }}\n",
+              "rightValue": "={{ $('Get Company Name').item.json.companyName.replace(/&amp;/g, '&') }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1540,
+        60
+      ],
+      "id": "72a202ee-fc3f-45a6-bcc4-e17fd50db8ab",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k",
+          "mode": "list",
+          "cachedResultName": "MidNorth - Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Wait').item.json.SheetName.category }}",
+          "mode": "name"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Company Name",
+              "lookupValue": "={{ $json.companyName }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "9793d7a5-52aa-4d18-a74d-c3e270ab811b",
+      "name": "Check Duplicates",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get inputs\nconst CompanyURL = $items('Company Specific Links')[0] || {};\nconst GetCompanyName = $items('Get Company Name')[0] || {};\nconst GetSearch = $items('Get Search')[0] || {};\n\n\nconst html = CompanyURL.json?.data || '';\n\n// Clean the HTML\nconst cleanHtml = html.replace(/\\n/g, ' ').replace(/\\s+/g, ' ');\n\n// Define regex patterns\nconst patterns = {\n  contactNumber: /<span[^>]*class=\"mlr__sub-text\"[^>]*>([^<]+)<\\/span>/i,\n  companyWebsite: /href=\"[^\"]*?redirect=([^\"&]+)/i,\n  streetAddress: /<span[^>]+itemprop=[\"']streetAddress[\"'][^>]*>([^<]+)<\\/span>/i,\n  addressLocality: /<span[^>]+itemprop=\"addressLocality\"[^>]*>([^<]+)<\\/span>/i,\n  addressRegion: /<span[^>]+itemprop=\"addressRegion\"[^>]*>([^<]+)<\\/span>/i,\n  postalCode: /<span[^>]+itemprop=\"postalCode\"[^>]*>([^<]+)<\\/span>/i\n};\n\n// Extract data or leave blank if not found\nconst extracted = {};\nfor (const key in patterns) {\n  const match = cleanHtml.match(patterns[key]);\n  extracted[key] = match ? match[1].trim() : '';\n}\n\n// Decode website URL\nextracted.companyWebsite = decodeURIComponent(extracted.companyWebsite || '');\n\n// Build complete address if components exist\nconst { streetAddress, addressLocality, addressRegion, postalCode } = extracted;\nextracted.completeAddress = [streetAddress, addressLocality, addressRegion, postalCode]\n  .filter(Boolean)\n  .join(', ')\n  .replace(', ' + postalCode, ' ' + postalCode);\n\n// Add company name from Get Company Name node\nextracted.companyName = GetCompanyName.json?.companyName || '';\n\n// Add search location from Get Search node\nextracted.searchLocation = GetSearch.json?.searchLocation || '';\n\n// Add full source URL using url from Loop Over Items node\nextracted.source = 'https://www.yellowpages.ca' + ($('Loop Over Items').first().json.url || '');\n\n// Return as output\nreturn [\n  {\n    json: extracted\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1760,
+        60
+      ],
+      "id": "1489155f-5db1-4836-a2dd-893338836a8b",
+      "name": "Get Company Details"
+    },
+    {
+      "parameters": {
+        "url": "=https://www.googleapis.com/customsearch/v1?key=AIzaSyBQiIVcfqGGyddpk4CE9wqoG80pfzutBoo&cx=a0844032c8b674ce7&q={{ $json.companyName }}+CEO+or+owner+{{ $json.searchLocation }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1980,
+        60
+      ],
+      "id": "c49461d6-8df9-4c9e-a534-e4b85b7f21b3",
+      "name": "Search Google About Company"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "GPT-4O"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=You are a helpful assistant that extracts contact information from Google search results. Just return this, and no other reasons:\nName:  \nLinkedIn:  \nEmail:  \nPosition:\nCompany:\n\nWho is the CEO/Owner/Director/Manager/someone with high position of {{ $json.CompanyName.companyName }}\n\n\nTheir website is: {{ $json.CompanyWebsite }}\n\nIf not found, return 'N/A'.\n\nYou can also look information on their website that I gave. If no email address of the person, you can put the email address of the company from the search or website. Do not guess.\nIf you know who? Then proceed to return the outputs. But if not, you can use these search based on these results on what you think who is the ceo of the company.\n\n{{ $json.Contents }}\n\nReturn JSON format\nremove the ```json on front of the input"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        2860,
+        60
+      ],
+      "id": "e629ba7e-79ef-4780-9a28-c6bdb15ca526",
+      "name": "OpenAI",
+      "retryOnFail": true,
+      "maxTries": 5,
+      "credentials": {
+        "openAiApi": {
+          "id": "2ZPUEbqWJrgF6bGL",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "aa7649a0-ddc9-455d-9c6e-d6759000283f",
+              "name": "Title",
+              "value": "={{ $json.title }}",
+              "type": "string"
+            },
+            {
+              "id": "552569d9-cf1b-4d29-96fa-772826e90ed8",
+              "name": "link",
+              "value": "={{ $json.link }}",
+              "type": "string"
+            },
+            {
+              "id": "22b35bd3-0336-4400-b6a0-e0a8be2118fa",
+              "name": "displayLink",
+              "value": "={{ $json.displayLink }}",
+              "type": "string"
+            },
+            {
+              "id": "0982828d-2b51-49d5-b0a8-d8bc16a57979",
+              "name": "Snippet",
+              "value": "={{ $json.snippet }}",
+              "type": "string"
+            },
+            {
+              "id": "9b03c523-832e-4c9b-b98d-bd039a651598",
+              "name": "htmlSnippet",
+              "value": "={{ $json.htmlSnippet }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2420,
+        60
+      ],
+      "id": "77fac8f8-6c1e-41a2-829f-be076a80d1d4",
+      "name": "JSON to TEXT"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        2200,
+        60
+      ],
+      "id": "102242ca-7d88-4e0f-8042-07735dd40d79",
+      "name": "Get all Results"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all().map(i => i.json);\nconst GetCompanyName = $items('Get Company Name')[0] || {};\nconst GetCompanyDetails = $items('Get Company Details')[0] || {};\n\n// Format each item as a block of text\nconst textBlocks = items.map(item => {\n  return Object.entries(item)\n    .map(([key, value]) => `${key}: ${value}`)\n    .join('\\n');\n});\n\n// Join all text blocks with a separator\nconst finalText = textBlocks.join('\\n\\n---\\n\\n');\n\n// Return it as a single string in one item\nreturn [\n  {\n    json: {\n      Contents: finalText,\n      CompanyName: GetCompanyName.json || {},\n      CompanyWebsite: GetCompanyDetails.json.companyWebsite || {},\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2640,
+        60
+      ],
+      "id": "55a5f588-cf2a-425f-89cc-0dda07318c70",
+      "name": "Get Contents, CompanyName,Website"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rawContent = $items('OpenAI')[0]?.json?.message?.content || '';\nconst GetCompanyDetails = $items('Get Company Details')[0]?.json || '';\nconst GetIndustry = $items('Set Variable for Sheets')[0]?.json || '';\nconst GetDate = $items('Get Current Date')[0]?.json || '';\n\n\n// Clean the raw content: remove ```json and ``` wrappers\nconst cleanedContent = rawContent\n  .replace(/^```json/i, '')   // remove starting ```json\n  .replace(/```$/, '')        // remove ending ```\n  .trim();                    // remove any extra whitespace\n\nlet parsedContent = {};\ntry {\n  parsedContent = JSON.parse(cleanedContent);\n} catch (e) {\n  parsedContent = { error: 'Failed to parse JSON', rawContent };\n}\n\nreturn [\n  {\n    json: {\n      ...parsedContent,\n      companyWebsite: GetCompanyDetails,\n      Industry: GetIndustry,\n      Date: GetDate\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3240,
+        60
+      ],
+      "id": "155f7e7f-621f-456c-befe-502d65e961f0",
+      "name": "Finalize"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k",
+          "mode": "list",
+          "cachedResultName": "MidNorth - Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.Industry.category }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date": "={{ $json.Date.currentDate }}",
+            "Industry": "={{ $json.Industry.category }}",
+            "Source": "={{ $json.companyWebsite.source }}",
+            "Company Name": "={{ $json.companyWebsite.companyName }}",
+            "Website": "={{ $json.companyWebsite.companyWebsite }}",
+            "Address": "={{ $json.companyWebsite.completeAddress }}",
+            "Contact Name": "={{ $json.Name }}",
+            "Position": "={{ $json.Position }}",
+            "Contact Number": "={{ $json.companyWebsite.contactNumber }}",
+            "Contact Email": "={{ $json.Email }}",
+            "Linkedin": "={{ $json.LinkedIn }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Industry",
+              "displayName": "Industry",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Source",
+              "displayName": "Source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Company Name",
+              "displayName": "Company Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Website",
+              "displayName": "Website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Address",
+              "displayName": "Address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Name",
+              "displayName": "Contact Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Position",
+              "displayName": "Position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Number",
+              "displayName": "Contact Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact Email",
+              "displayName": "Contact Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Linkedin",
+              "displayName": "Linkedin",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Column 1",
+              "displayName": "Column 1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "LinkedIn Connected",
+              "displayName": "LinkedIn Connected",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn Followed",
+              "displayName": "LinkedIn Followed",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "LinkedIn Messaged",
+              "displayName": "LinkedIn Messaged",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Issued to Midnorth",
+              "displayName": "Issued to Midnorth",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3460,
+        140
+      ],
+      "id": "567951c1-3d11-416c-a789-eaee324f9327",
+      "name": "Add to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get current and max page from previous node\nconst getPageNum = $items('Get Current and Max Page')[0]?.json || {};\n\nconst currentPage = getPageNum.currentPage || 1;\nconst maxPage = getPageNum.maxPage || 1;\n\n// Calculate how many pages to loop\nconst totalPages = maxPage - (currentPage - 1);\n\n// Generate page numbers array starting from currentPage\nconst pageNumbers = Array.from({ length: totalPages }, (_, i) => currentPage + i);\n\n// Return one item per page\nreturn pageNumbers.map(page => ({\n  json: {\n    page\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1100,
+        200
+      ],
+      "id": "0ab8dcea-850a-45a3-93a5-7054c3f522c1",
+      "name": "Page Loop"
+    },
+    {
+      "parameters": {
+        "jsCode": "const getPageNum = $items('Loop Over Items1')[0]?.json || {};\nconst nextPage = (getPageNum.page || 0) + 1;\n\nreturn [\n  {\n    json: {\n      page: nextPage\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        220,
+        380
+      ],
+      "id": "be0a55a0-1f37-4df2-8e73-28e83c4ab5f7",
+      "name": "Next Page"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -880,
+        200
+      ],
+      "id": "2cadd7ff-8d41-4ac6-93e7-2fcd91925fe4",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": "={{ $prevNode.name === 'Get Company Links' }}"
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        0,
+        80
+      ],
+      "id": "f5fefa0f-7884-4c4a-80fe-0e0baef64d5e",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Done",
+      "typeVersion": 1,
+      "position": [
+        -480,
+        340
+      ],
+      "id": "e4085b18-0083-494b-be62-2d5808afd569"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "documentId": {
+          "__rl": true,
+          "value": "1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k",
+          "mode": "list",
+          "cachedResultName": "MidNorth - Lead Generation",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1036445207,
+          "mode": "list",
+          "cachedResultName": "URL",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Go3VqdyUvVSwtbNkG_VQCmzLc-lm-2woUockkb4j21k/edit#gid=1036445207"
+        },
+        "event": "rowUpdate",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2640,
+        200
+      ],
+      "id": "f673658a-3ad4-4f69-884f-a255b0e8a899",
+      "name": "Google Sheets Trigger",
+      "credentials": {
+        "googleSheetsTriggerOAuth2Api": {
+          "id": "ingq7bidaTd348dJ",
+          "name": "Google Sheets Trigger account"
+        }
+      }
+    }
+  ],
+  "pinData": {
+    "Google Sheets Trigger": [
+      {
+        "json": {
+          "row_number": 2,
+          "Paste URL Below": "https://www.yellowpages.ca/search/si/1/Mining/british+columbia"
+        }
+      }
+    ]
+  },
+  "connections": {
+    "When clicking ‘Test workflow’": {
+      "main": [
+        []
+      ]
+    },
+    "Random Header": {
+      "main": [
+        [
+          {
+            "node": "Enter YellowPages.ca",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter YellowPages.ca": {
+      "main": [
+        [
+          {
+            "node": "Get Search",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Links": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current and Max Page": {
+      "main": [
+        [
+          {
+            "node": "Page Loop",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Search": {
+      "main": [
+        [
+          {
+            "node": "Get Current Date",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Date": {
+      "main": [
+        [
+          {
+            "node": "Set Variable for Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Company Specific Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Previous Nodes": {
+      "main": [
+        [
+          {
+            "node": "Enter YellowPages.ca Company List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Variable for Sheets": {
+      "main": [
+        [
+          {
+            "node": "Get Current and Max Page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter YellowPages.ca Company List": {
+      "main": [
+        [
+          {
+            "node": "Get Company Links",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Previous Nodes (HEADER)": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Company Specific Links": {
+      "main": [
+        [
+          {
+            "node": "Get Company Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Random Header 2": {
+      "main": [
+        [
+          {
+            "node": "Get Previous Nodes (HEADER)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Name": {
+      "main": [
+        [
+          {
+            "node": "Check Duplicates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Company Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Duplicates": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Company Details": {
+      "main": [
+        [
+          {
+            "node": "Search Google About Company",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Google About Company": {
+      "main": [
+        [
+          {
+            "node": "Get all Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI": {
+      "main": [
+        [
+          {
+            "node": "Finalize",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "JSON to TEXT": {
+      "main": [
+        [
+          {
+            "node": "Get Contents, CompanyName,Website",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get all Results": {
+      "main": [
+        [
+          {
+            "node": "JSON to TEXT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contents, CompanyName,Website": {
+      "main": [
+        [
+          {
+            "node": "OpenAI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize": {
+      "main": [
+        [
+          {
+            "node": "Add to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add to Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Page Loop": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Next Page": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Previous Nodes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Next Page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Random Header 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets Trigger": {
+      "main": [
+        [
+          {
+            "node": "Random Header",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "414b427c-8976-4073-a2fc-2ce08b59431c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d3a7cf79eb4a246fe933cc979694a1777c838c2b02662fe2ce3c7cfa96454a58"
+  },
+  "id": "q2A17Co7iX7Qd9CY",
+  "tags": []
+}
