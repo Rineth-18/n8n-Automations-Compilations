@@ -1,0 +1,908 @@
+{
+  "name": "Comparison Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Variables for Google Sheet').item.json.CheckAndBalanceID }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.checkBalanceSheets }}",
+          "mode": "name"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "specifyRange",
+              "firstDataRow": 3
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1020,
+        100
+      ],
+      "id": "8607eadd-30a3-402e-a112-2342be15b5b8",
+      "name": "Check and Balance",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Check and Balance\");\n\nconst format = value => {\n  const num = parseFloat(value);\n  return isNaN(num) ? value : parseFloat(num.toFixed(2));\n};\n\nconst output = items.map(item => {\n  const data = item.json;\n\n  return {\n    json: {\n      row_number: data.row_number,\n      IncStm_ManagementReport: data[\"INCOME STATEMENT\"],\n      IncStm_MRvalue: format(data.col_8),\n      IncStm_MRtotal: format(data.col_9),\n      IncStm_Appfolio: data.col_12,\n      IncStm_AppValue: format(data.col_13),\n      IncStm_AppTotal: format(data.col_14),\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        100
+      ],
+      "id": "29e32527-65e4-454c-9fa3-df4cbb527050",
+      "name": "Get Income Statement"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Check and Balance\");\n\nconst format = value => {\n  const num = parseFloat(value);\n  return isNaN(num) ? value : parseFloat(num.toFixed(2));\n};\n\nconst output = items.map(item => {\n  const data = item.json;\n\n  return {\n    json: {\n      row_number: data.row_number,\n      CshStm_MRDate: data.col_17,\n      CshStm_ManagementReport: data.col_18,\n      CshStm_MRbeginDebit: format(data.col_19),\n      CshStm_MRcred: format(data.col_20),\n      CshStm_MR_NetTrans: format(data.col_21),\n      CshStm_AppDate: data.col_22,\n      CshStm_Appfolio: data.col_23,\n      CshStm_AppType: data.col_24,\n      CshStm_AppCode: data.col_25,\n      CshStm_AppbeginDebit: format(data.col_26),\n      CshStm_Appcred: format(data.col_27),\n      CshStm_App_NetTrans: format(data.col_28)\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        -100
+      ],
+      "id": "517cdfcb-b039-4fff-b0c7-8b840327e659",
+      "name": "Get Cash Statement"
+    },
+    {
+      "parameters": {
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $('Variables for Google Sheet').item.json.CheckAndBalanceID }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "sheets.properties.title"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        140,
+        100
+      ],
+      "id": "012ae98d-5c8b-4781-9fb4-7eda06ce93c4",
+      "name": "Enter Check and Balance",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.VarianceReportID }}",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "fields",
+              "value": "sheets.properties.title"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -80,
+        100
+      ],
+      "id": "e5738929-dca6-4d93-8ceb-a4022b9ebf2a",
+      "name": "Enter Variance Report",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Get Income Statement\");\n\n// Find MR income row\nconst incomeMR = items.find(item => {\n  const data = item.json;\n  const report = (data.IncStm_ManagementReport || \"\").toLowerCase();\n  const valid = data.IncStm_MRtotal !== null && data.IncStm_MRtotal !== undefined && data.IncStm_MRtotal !== \"\";\n  return report.includes(\"total\") && report.includes(\"income\") && valid;\n});\n\n// Find MR expense row\nconst expenseMR = [...items] // Clone the array to avoid mutation\n  .reverse() // Reverse to start from the end\n  .find(item => {\n    const data = item.json;\n    const report = (data.IncStm_ManagementReport || \"\").toLowerCase();\n    const valid = data.IncStm_MRtotal !== null && data.IncStm_MRtotal !== undefined && data.IncStm_MRtotal !== \"\";\n    return report.includes(\"total\") && report.includes(\"expenses\") && valid;\n  });\n\n\n// Find Appfolio income row\nconst incomeApp = items.find(item => {\n  const data = item.json;\n  const report = (data.IncStm_Appfolio || \"\").toLowerCase();\n  const valid = data.IncStm_AppTotal !== null && data.IncStm_AppTotal !== undefined && data.IncStm_AppTotal !== \"\";\n  return report.includes(\"total\") && report.includes(\"income\") && valid;\n});\n\n// Find Appfolio expense row\nconst expenseApp = items.find(item => {\n  const data = item.json;\n  const report = (data.IncStm_Appfolio || \"\").toLowerCase();\n  const valid = data.IncStm_AppTotal !== null && data.IncStm_AppTotal !== undefined && data.IncStm_AppTotal !== \"\";\n  return report.includes(\"total\") && report.includes(\"expenses\") && valid;\n});\n\n// Final output\nreturn [{\n  json: {\n    // MR\n    IncStm_MR_income: incomeMR?.json.IncStm_ManagementReport || \"\",\n    IncStm_MRtotal_income: incomeMR?.json.IncStm_MRtotal || \"\",\n    IncStm_MR_expense: expenseMR?.json.IncStm_ManagementReport || \"\",\n    IncStm_MRtotal_expense: expenseMR?.json.IncStm_MRtotal || \"\",\n    \n    // Appfolio\n    IncStm_App_Income: incomeApp?.json.IncStm_Appfolio || \"\",\n    IncStm_AppTotal_income: incomeApp?.json.IncStm_AppTotal || \"\",\n    IncStm_App_Expense: expenseApp?.json.IncStm_Appfolio || \"\",\n    IncStm_AppTotal_expense: expenseApp?.json.IncStm_AppTotal || \"\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        100
+      ],
+      "id": "49eea652-76f4-434d-a670-23961d8003c2",
+      "name": "Get Income and Expense"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $items(\"Access Sheet\")[0].json.values || [];\nconst incomeExpenseData = $items(\"Get Income and Expense\")[0].json;\nconst varianceSheet = $items(\"Variance Sheet\")[0].json.checkBalanceSheets;\n\nconst keyRows = ['Income', 'Expense', 'Cash Ending', 'General Ledger'];\nconst output = [];\n\n// Extract target month from sheet name\nconst match = varianceSheet.match(/(\\d{2})[\\s.]?(\\d{4})$/);\n\nlet targetMonth = '';\n\nif (match) {\n  const [, month, year] = match;\n  const monthName = new Date(`${year}-${month}-01`).toLocaleString('en-US', { month: 'long' });\n  targetMonth = `${monthName.toUpperCase()} ${year}`; // e.g., \"JANUARY 2025\"\n} else {\n  throw new Error(\"Unable to extract month and year from variance sheet name\");\n}\n\nlet currentMonth = '';\n\nfor (let i = 0; i < rows.length; i++) {\n  const row = rows[i];\n\n  // Detect new month section (e.g., \"JANUARY 2025\")\n  if (row.length === 1 && typeof row[0] === 'string' && row[0].includes('2025')) {\n    currentMonth = row[0].toUpperCase(); // Normalize to uppercase\n    continue;\n  }\n\n  // Only process rows under the matching month\n  if (currentMonth !== targetMonth) continue;\n\n  const type = row[0];\n  if (keyRows.includes(type)) {\n    const variance = row[3] || '';\n    const inMgmt = row[1] || '';\n    const inAppfolio = row[2] || '';\n    const remarks = row[4] || '';\n\n    const isVarianceNotEmpty = variance.toString().trim() !== '';\n    const hasMissingFields = !inMgmt.trim() || !inAppfolio.trim() || !remarks.trim();\n\n    if (isVarianceNotEmpty && hasMissingFields) {\n      const rowNumber = i + 1;\n      const updates = [];\n\n      if (!inMgmt.trim()) {\n        if (type === 'Income') {\n          updates.push({ range: `B${rowNumber}`, value: incomeExpenseData.IncStm_MRtotal_income });\n        } else if (type === 'Expense') {\n          updates.push({ range: `B${rowNumber}`, value: incomeExpenseData.IncStm_MRtotal_expense });\n        }\n      }\n\n      if (!inAppfolio.trim()) {\n        if (type === 'Income') {\n          updates.push({ range: `C${rowNumber}`, value: incomeExpenseData.IncStm_AppTotal_income });\n        } else if (type === 'Expense') {\n          updates.push({ range: `C${rowNumber}`, value: incomeExpenseData.IncStm_AppTotal_expense });\n        }\n      }\n\n      output.push({\n        json: {\n          month: currentMonth,\n          type,\n          variance,\n          updates\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        100
+      ],
+      "id": "f9cf51a6-b274-41b2-8a7e-ceb1bdba4cd9",
+      "name": "Search for Cells",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $('Variables for Google Sheet').item.json.VarianceReportID }}/values/{{ $('Loop Over Items').item.json.varianceSheetRef }}A:G",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        860,
+        100
+      ],
+      "id": "63f352e0-ec54-4ee1-9ba8-4a1893d5591c",
+      "name": "Access Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Get Cash Statement\");\n\n// Helper function: check if string contains \"ending\" (case-insensitive)\nfunction containsEnding(str) {\n  return typeof str === 'string' && str.toLowerCase().includes(\"ending\");\n}\n\n// Find row where CshStm_MRbeginDebit contains \"ending\"\nconst mrItem = items.find(item => containsEnding(item.json.CshStm_MRbeginDebit));\n\n// Find row where CshStm_AppbeginDebit contains \"ending\"\nconst appItem = items.find(item => containsEnding(item.json.CshStm_AppbeginDebit));\n\n// Output\nreturn [{\n  json: {\n    MR_cash_ending: mrItem?.json.CshStm_MRcred || \"\",\n    Appfo_cash_ending: appItem?.json.CshStm_Appcred || \"\"\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        -100
+      ],
+      "id": "f054aabe-2b1a-44d0-8775-b6e75cbbec1a",
+      "name": "Get Cash Ending"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $items(\"Access Sheet\")[0].json.values || [];\nconst incomeExpenseData = $items(\"Get Cash Ending\")[0].json;\nconst varianceSheet = $items(\"Variance Sheet\")[0].json.checkBalanceSheets;\n\nconst keyRows = ['Income', 'Expense', 'Cash Ending', 'General Ledger'];\nconst output = [];\n\n// Extract month and year from sheet name (e.g. \"0001 - South Hill - 01.2025\" or \"0001 - South Hill - 01 2025\")\nconst match = varianceSheet.match(/(\\d{2})[\\s.]?(\\d{4})$/);\n\nlet targetMonth = '';\n\nif (match) {\n  const [, month, year] = match;\n  const monthName = new Date(`${year}-${month}-01`).toLocaleString('en-US', { month: 'long' });\n  targetMonth = `${monthName.toUpperCase()} ${year}`; // e.g., \"JANUARY 2025\"\n} else {\n  throw new Error(\"Unable to extract month and year from variance sheet name\");\n}\n\nlet currentMonth = '';\n\nfor (let i = 0; i < rows.length; i++) {\n  const row = rows[i];\n\n  // Detect section header that includes the month (e.g., \"JANUARY 2025\")\n  if (row.length === 1 && typeof row[0] === 'string' && row[0].includes('2025')) {\n    currentMonth = row[0].toUpperCase(); // Normalize to uppercase\n    continue;\n  }\n\n  // Only process rows under the matching month\n  if (currentMonth !== targetMonth) continue;\n\n  const type = row[0];\n  if (keyRows.includes(type)) {\n    const inMgmt = row[1] || '';\n    const inAppfolio = row[2] || '';\n    const variance = row[3] || '';\n    const remarks = row[4] || '';\n\n    const isVarianceNotEmpty = variance.toString().trim() !== '';\n    const hasMissingFields = !inMgmt.trim() || !inAppfolio.trim() || !remarks.trim();\n\n    if (isVarianceNotEmpty && hasMissingFields) {\n      const rowNumber = i + 1;\n      const updates = [];\n\n      if (!inMgmt.trim() && type === 'Cash Ending') {\n        updates.push({ range: `B${rowNumber}`, value: incomeExpenseData.MR_cash_ending });\n      }\n\n      if (!inAppfolio.trim() && type === 'Cash Ending') {\n        updates.push({ range: `C${rowNumber}`, value: incomeExpenseData.Appfo_cash_ending });\n      }\n\n      output.push({\n        json: {\n          month: currentMonth,\n          type,\n          variance,\n          updates\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        -100
+      ],
+      "id": "0817a625-0641-48e8-963d-3fd0023388f7",
+      "name": "Search for Cells 2",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Check and Balance\");\n\nconst format = value => {\n  const num = parseFloat(value);\n  return isNaN(num) ? value : parseFloat(num.toFixed(2));\n};\n\nconst output = items.map(item => {\n  const data = item.json;\n\n  return {\n    json: {\n      row_number: data.row_number,\n      \n      GL_ManagementReport: data.col_30,\n      GL_MR_Debit: format(data.col_31),\n      GL_MR_Cred: format(data.col_32),\n      \n      GL_Appfolio: data.col_33,\n      GL_App_Debit: format(data.col_34),\n      GL_App_Cred: format(data.col_35),\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1280,
+        300
+      ],
+      "id": "01103eb3-5b47-4a52-84a0-801bb28ac7f3",
+      "name": "Get General Ledger"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "aa40a320-24fe-4dd5-83c6-64513e26f8bf",
+              "leftValue": "={{ $json.updates }}",
+              "rightValue": "",
+              "operator": {
+                "type": "array",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        2740,
+        100
+      ],
+      "id": "135e2fe3-a5c8-4a7a-906c-7451318c88b0",
+      "name": "Filter",
+      "alwaysOutputData": true,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Get General Ledger\");\n\n// Initialize variables to hold the last non-empty values\nlet lastMRDebit = \"\";\nlet lastAppDebit = \"\";\n\n// Iterate from the end to find the last item with values\nfor (let i = items.length - 1; i >= 0; i--) {\n  const item = items[i].json;\n  const hasMR = item.GL_MR_Debit !== undefined && item.GL_MR_Debit !== \"\";\n  const hasApp = item.GL_App_Debit !== undefined && item.GL_App_Debit !== \"\";\n\n  if (hasMR || hasApp) {\n    if (hasMR) lastMRDebit = item.GL_MR_Debit;\n    if (hasApp) lastAppDebit = item.GL_App_Debit;\n    break;\n  }\n}\n\n// Output the found values\nreturn [{\n  json: {\n    GL_MR_Debit: lastMRDebit,\n    GL_App_Debit: lastAppDebit\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1500,
+        300
+      ],
+      "id": "d21bf6c4-2d23-401a-b533-8c14282a251a",
+      "name": "Get GL Values"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://sheets.googleapis.com/v4/spreadsheets/{{ $json.VarianceReportID }}/values:batchUpdate\n",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleSheetsOAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "valueInputOption",
+              "value": "USER_ENTERED"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "raw",
+        "rawContentType": "application/json",
+        "body": "={\n  \"valueInputOption\": \"USER_ENTERED\",\n  \"data\": {{ JSON.stringify(\n    $json.updates.map(update => ({\n      range: `${$json.varianceSheets}!${update.range}`,\n      values: [[ update.value ]]\n    }))\n  ) }}\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        3180,
+        180
+      ],
+      "id": "9eaa9cc0-32a6-4355-9992-451a70d09ecd",
+      "name": "Add to Variance Sheet",
+      "retryOnFail": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $items(\"Access Sheet\")[0].json.values || [];\nconst incomeExpenseData = $items(\"Get GL Values\")[0].json;\nconst varianceSheet = $items(\"Variance Sheet\")[0].json.checkBalanceSheets;\n\nconst keyRows = ['Income', 'Expense', 'Cash Ending', 'General Ledger'];\nconst output = [];\n\n// Extract target month from sheet name\nconst match = varianceSheet.match(/(\\d{2})[\\s.]?(\\d{4})$/);\nlet targetMonth = '';\n\nif (match) {\n  const [, month, year] = match;\n  const monthName = new Date(`${year}-${month}-01`).toLocaleString('en-US', { month: 'long' });\n  targetMonth = `${monthName.toUpperCase()} ${year}`; // e.g., \"JANUARY 2025\"\n} else {\n  throw new Error(\"Unable to extract month and year from variance sheet name\");\n}\n\nlet currentMonth = '';\n\nfor (let i = 0; i < rows.length; i++) {\n  const row = rows[i];\n\n  // Detect month (e.g., \"JANUARY 2025\")\n  if (row.length === 1 && typeof row[0] === 'string' && row[0].includes('2025')) {\n    currentMonth = row[0].toUpperCase(); // Normalize for comparison\n    continue;\n  }\n\n  // Only process rows under the matching month\n  if (currentMonth !== targetMonth) continue;\n\n  const type = row[0];\n  if (keyRows.includes(type)) {\n    const variance = row[3] || '';\n    const inMgmt = row[1] || '';\n    const inAppfolio = row[2] || '';\n    const remarks = row[4] || '';\n\n    const isVarianceNotEmpty = variance.toString().trim() !== '';\n    const hasMissingFields = !inMgmt.trim() || !inAppfolio.trim() || !remarks.trim();\n\n    if (isVarianceNotEmpty && hasMissingFields) {\n      const rowNumber = i + 1;\n      const updates = [];\n\n      // Management Report column (B)\n      if (!inMgmt.trim()) {\n        if (type === 'General Ledger') {\n          updates.push({ range: `B${rowNumber}`, value: incomeExpenseData.GL_MR_Debit });\n        }\n      }\n\n      // Appfolio column (C)\n      if (!inAppfolio.trim()) {\n        if (type === 'General Ledger') {\n          updates.push({ range: `C${rowNumber}`, value: incomeExpenseData.GL_App_Debit });\n        }\n      }\n\n      output.push({\n        json: {\n          month: currentMonth,\n          type,\n          variance,\n          updates\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1720,
+        300
+      ],
+      "id": "083b819b-783c-455a-a10c-186b76bc9a99",
+      "name": "Search for Cells 3",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "content": "## INCOME STATEMENT\n",
+        "height": 680,
+        "width": 720,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1200,
+        -200
+      ],
+      "typeVersion": 1,
+      "id": "544ce514-eae0-4c6d-b63c-49ff06aa6109",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Income and Expenses\n",
+        "height": 180,
+        "width": 620,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        60
+      ],
+      "id": "3e0ab99f-5d63-4338-b29a-818e28036a63",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Cash Ending\n",
+        "height": 180,
+        "width": 620,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        -140
+      ],
+      "id": "f3d2ad1b-9866-41d7-8615-38295f784385",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## General Ledger\n",
+        "height": 180,
+        "width": 620
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1240,
+        260
+      ],
+      "id": "58cab70a-1bb7-4c2c-9019-deb0f4c4bca9",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $items(\"Get Cash Statement\");\n\n// Helper to check if a string contains \"Beginning\" (case-insensitive)\nfunction containsBeginning(value) {\n  return typeof value === \"string\" && value.toLowerCase().includes(\"beginning\");\n}\n\n// Convert string to float safely\nfunction toFloat(value) {\n  const num = parseFloat(value);\n  return isNaN(num) ? 0 : num;\n}\n\n// Find beginning rows\nconst mrItem = items.find(item => containsBeginning(item.json.CshStm_MRbeginDebit));\nconst appItem = items.find(item => containsBeginning(item.json.CshStm_AppbeginDebit));\n\n// Find first non-empty NetTrans values\nconst mrNetRaw = items.find(item => item.json.CshStm_MR_NetTrans?.toString().trim() !== \"\")?.json.CshStm_MR_NetTrans;\nconst appNetRaw = items.find(item => item.json.CshStm_App_NetTrans?.toString().trim() !== \"\")?.json.CshStm_App_NetTrans;\n\nlet mrNetValue = mrNetRaw || \"\";\nlet appNetValue = appNetRaw || \"\";\n\n// Calculate NetTrans if not present\nif (mrNetValue === \"\") {\n  const sumBegin = items\n    .filter(item => item.json.CshStm_ManagementReport?.toString().trim() !== \"\")\n    .reduce((sum, item) => sum + toFloat(item.json.CshStm_MRbeginDebit), 0);\n\n  const sumCred = items\n    .filter(item => item.json.CshStm_ManagementReport?.toString().trim() !== \"\")\n    .reduce((sum, item) => sum + toFloat(item.json.CshStm_MRcred), 0);\n\n  mrNetValue = (sumBegin - sumCred).toFixed(2);\n}\n\nif (appNetValue === \"\") {\n  const sumBegin = items\n    .filter(item => item.json.CshStm_AppCode?.toString().trim() !== \"\")\n    .reduce((sum, item) => sum + toFloat(item.json.CshStm_AppbeginDebit), 0);\n\n  const sumCred = items\n    .filter(item => item.json.CshStm_AppCode?.toString().trim() !== \"\")\n    .reduce((sum, item) => sum + toFloat(item.json.CshStm_Appcred), 0);\n\n  appNetValue = (sumBegin - sumCred).toFixed(2);\n}\n\n// Return the results\nreturn [{\n  json: {\n    CS_MR_Beginning: mrItem?.json.CshStm_MRcred || \"\",\n    CS_App_Beginning: appItem?.json.CshStm_Appcred || \"\",\n    CS_MR_NetTrans: mrNetValue,\n    CS_App_NetTrans: appNetValue\n  }\n}];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2100,
+        -100
+      ],
+      "id": "b8a5a651-a292-4b62-8347-1cde32c342e1",
+      "name": "Get Beginning Cash",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "content": "## Cash Statement\n",
+        "height": 180,
+        "width": 380,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2060,
+        -140
+      ],
+      "id": "04f0ca5a-86d5-4c9a-a398-ce18d0631c8e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $items(\"Access Sheet\")[0].json.values || [];\nconst beginningCashData = $items(\"Get Beginning Cash\")[0].json;\nconst varianceSheet = $items(\"Variance Sheet\")[0].json.checkBalanceSheets;\n\nconst keyRows = ['Cash Beginning', 'Net Transaction'];\nconst output = [];\n\n// Extract month from sheet name (e.g., \"0001 - South Hill - 01.2025\" or \"0001 - South Hill - 01 2025\")\nconst match = varianceSheet.match(/(\\d{2})[\\s.]?(\\d{4})$/);\nlet targetMonth = '';\n\nif (match) {\n  const [, month, year] = match;\n  const monthName = new Date(`${year}-${month}-01`).toLocaleString('en-US', { month: 'long' });\n  targetMonth = `${monthName.toUpperCase()} ${year}`; // e.g., \"JANUARY 2025\"\n} else {\n  throw new Error(\"Unable to extract month and year from variance sheet name\");\n}\n\nlet currentMonth = '';\n\nfor (let i = 0; i < rows.length; i++) {\n  const row = rows[i];\n\n  // Detect the section month header in the sheet\n  if (row.length === 1 && typeof row[0] === 'string' && row[0].includes('2025')) {\n    currentMonth = row[0].toUpperCase(); // Normalize\n    continue;\n  }\n\n  // Only process rows under the correct month\n  if (currentMonth !== targetMonth) continue;\n\n  const type = row[0] || '';\n  if (keyRows.includes(type)) {\n    const inMgmt = row[1] || '';\n    const inAppfolio = row[2] || '';\n\n    const hasMissingFields = !inMgmt.trim() || !inAppfolio.trim();\n    if (hasMissingFields) {\n      const rowNumber = i + 1;\n      const updates = [];\n\n      // Management Report\n      if (!inMgmt.trim()) {\n        if (type === 'Cash Beginning') {\n          updates.push({ range: `B${rowNumber}`, value: beginningCashData.CS_MR_Beginning });\n        } else if (type === 'Net Transaction') {\n          updates.push({ range: `B${rowNumber}`, value: beginningCashData.CS_MR_NetTrans });\n        }\n      }\n\n      // Appfolio\n      if (!inAppfolio.trim()) {\n        if (type === 'Cash Beginning') {\n          updates.push({ range: `C${rowNumber}`, value: beginningCashData.CS_App_Beginning });\n        } else if (type === 'Net Transaction') {\n          updates.push({ range: `C${rowNumber}`, value: beginningCashData.CS_App_NetTrans });\n        }\n      }\n\n      output.push({\n        json: {\n          month: currentMonth,\n          type,\n          updates\n        }\n      });\n    }\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2300,
+        -100
+      ],
+      "id": "fa2fefb8-f819-459b-b683-d1e8e3b86929",
+      "name": "Get Range, Place Values",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"VarianceReportID\": \"1Znj05IVpkcicG5Gj0UgekZnjeEEICeMUZ8KuUtK6wb0\",\n  \n  \"CheckAndBalanceID\": \"1lQETXS-SU3zoe9bxS1Qany2jzNnkNf9BHnuSnMA-fhM\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -300,
+        100
+      ],
+      "id": "0444b0f7-b55a-472f-af37-09141a54e4fd",
+      "name": "Variables for Google Sheet"
+    },
+    {
+      "parameters": {
+        "jsCode": "const varianceSheets = $items(\"Enter Variance Report\")[0].json.sheets || [];\nconst checkBalanceSheets = $items(\"Enter Check and Balance\")[0].json.sheets || [];\n\nconst varianceTitles = varianceSheets.map(sheet => sheet.properties?.title?.trim()).filter(Boolean);\nconst checkTitles = checkBalanceSheets.map(sheet => sheet.properties?.title?.trim()).filter(Boolean);\n\n// Helper function to extract all years (4-digit numbers) from an array of strings\nfunction extractYears(titles) {\n  const years = new Set();\n  const yearRegex = /\\b(20\\d{2})\\b/g; // matches years 2000-2099\n\n  for (const title of titles) {\n    let match;\n    while ((match = yearRegex.exec(title)) !== null) {\n      years.add(match[1]);\n    }\n  }\n\n  return Array.from(years).map(Number);\n}\n\n// Extract years from both sets of titles\nconst varianceYears = extractYears(varianceTitles);\nconst checkYears = extractYears(checkTitles);\n\n// Combine and find the latest year\nconst allYears = [...varianceYears, ...checkYears];\nconst latestYear = allYears.length ? Math.max(...allYears).toString() : null;\n\nconst matched = [];\n\nfor (const sheet of checkBalanceSheets) {\n  const title = sheet.properties?.title || \"\";\n\n  // Skip if no latest year found (or title doesn't contain latest year)\n  if (latestYear && !title.includes(latestYear)) continue;\n\n  // Extract code (number) from checkBalance title\n  const match = title.match(/^0*(\\d+)\\s*-/);\n\n  if (match) {\n    let code = match[1];           // e.g., \"0007\"\n\n    // Normalize code to last 2 digits, padded if needed\n    code = code.slice(-2).padStart(2, '0');\n\n    // Step 1: Try to find variance title with this code AND latestYear somewhere\n    let matchedTitle = varianceTitles.find(vTitle =>\n      vTitle.startsWith(code) && (!latestYear || vTitle.includes(latestYear))\n    );\n\n    // Step 2: Fallback to variance title starting with this code only (no year required)\n    if (!matchedTitle) {\n      matchedTitle = varianceTitles.find(vTitle =>\n        vTitle.startsWith(code)\n      );\n    }\n\n    if (matchedTitle) {\n      const encodedSheetRef = `%27${encodeURIComponent(matchedTitle)}%27!`;\n\n      matched.push({\n        json: {\n          checkBalanceSheets: title,\n          varianceSheets: matchedTitle,\n          varianceSheetRef: encodedSheetRef\n        }\n      });\n    }\n  }\n}\n\nreturn matched;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        300,
+        100
+      ],
+      "id": "2df82609-4e2d-45b9-bdac-d7e6d9ad8d93",
+      "name": "Filter Sheets"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        500,
+        260
+      ],
+      "id": "120599a1-2c12-4ea7-9fbe-6d0e2117dc0c",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2540,
+        80
+      ],
+      "id": "ef1416d3-40b6-467c-98b5-8ba689a98d2e",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3340,
+        460
+      ],
+      "id": "f75b17ec-4c92-4bbf-8b79-3359f339f28e",
+      "name": "Wait",
+      "webhookId": "b8483355-50c9-4abd-9586-216b57c82bc8"
+    },
+    {
+      "parameters": {
+        "jsCode": "const variablesItems = $items(\"Variables for Google Sheet\");\nconst varianceSheetItem = $items(\"Variance Sheet\")[0]; // Assuming single item\n\nconst varianceSheets = varianceSheetItem.json?.varianceSheets?.trim() || \"\";\n\n// Attach varianceSheets to each Variables for Google Sheet item\nreturn variablesItems.map(item => ({\n  json: {\n    ...item.json,\n    varianceSheets\n  }\n}));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2740,
+        260
+      ],
+      "id": "108afa26-cfb8-4334-9e0d-87cc9fc988d9",
+      "name": "Get Google sheet info",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT * \nFROM input1 \nLEFT JOIN input2 \nON input1.name = input2.id;\n"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2980,
+        180
+      ],
+      "id": "a1e760a6-e72b-4827-8eb7-7633edf90794",
+      "name": "Final"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e2d8f0cd-947b-4dca-9d25-12b0f6e0ac2d",
+              "name": "varianceSheets",
+              "value": "={{ $json.varianceSheets }}",
+              "type": "string"
+            },
+            {
+              "id": "5811ae2f-ebbe-4166-9f6d-1da9c0f09e4c",
+              "name": "checkBalanceSheets",
+              "value": "={{ $json.checkBalanceSheets }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        680,
+        100
+      ],
+      "id": "d8405f2a-a0d1-4b71-b632-14d74b6ee0f2",
+      "name": "Variance Sheet"
+    },
+    {
+      "parameters": {
+        "formTitle": "TNM Check and Balance to Variance Report",
+        "formDescription": "Click the submit button to start the automation and populate the Variance Report.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -480,
+        100
+      ],
+      "id": "64dbd6e0-c44d-4b57-8bd5-c362be63398f",
+      "name": "On form submission",
+      "webhookId": "013ebe50-40b6-4e62-9dfa-a3a08a110c0c"
+    },
+    {
+      "parameters": {
+        "content": "## Variables Node for Google Sheets ID"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -360,
+        -100
+      ],
+      "id": "907d7dc1-b526-4e99-8ce9-c5c22065e2b3",
+      "name": "Sticky Note5"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Check and Balance": {
+      "main": [
+        [
+          {
+            "node": "Get Income Statement",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Cash Statement",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get General Ledger",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Income Statement": {
+      "main": [
+        [
+          {
+            "node": "Get Income and Expense",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter Check and Balance": {
+      "main": [
+        [
+          {
+            "node": "Filter Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enter Variance Report": {
+      "main": [
+        [
+          {
+            "node": "Enter Check and Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Income and Expense": {
+      "main": [
+        [
+          {
+            "node": "Search for Cells",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for Cells": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Access Sheet": {
+      "main": [
+        [
+          {
+            "node": "Check and Balance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cash Statement": {
+      "main": [
+        [
+          {
+            "node": "Get Cash Ending",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Cash Ending": {
+      "main": [
+        [
+          {
+            "node": "Search for Cells 2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for Cells 2": {
+      "main": [
+        [
+          {
+            "node": "Get Beginning Cash",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get General Ledger": {
+      "main": [
+        [
+          {
+            "node": "Get GL Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get GL Values": {
+      "main": [
+        [
+          {
+            "node": "Search for Cells 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search for Cells 3": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Add to Variance Sheet": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Beginning Cash": {
+      "main": [
+        [
+          {
+            "node": "Get Range, Place Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Range, Place Values": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variables for Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Enter Variance Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Sheets": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Variance Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Google sheet info",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Google sheet info": {
+      "main": [
+        [
+          {
+            "node": "Final",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Final": {
+      "main": [
+        [
+          {
+            "node": "Add to Variance Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Variance Sheet": {
+      "main": [
+        [
+          {
+            "node": "Access Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Variables for Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "47de5ca4-0acc-4d1f-b8c5-c084b4ded023",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d3a7cf79eb4a246fe933cc979694a1777c838c2b02662fe2ce3c7cfa96454a58"
+  },
+  "id": "hAyBIKIpQezIQw3U",
+  "tags": []
+}
