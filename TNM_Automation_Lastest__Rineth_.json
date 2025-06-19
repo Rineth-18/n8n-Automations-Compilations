@@ -1,0 +1,2761 @@
+{
+  "name": "TNM Automation Lastest (Rineth)",
+  "nodes": [
+    {
+      "parameters": {
+        "jsCode": "// Step 1: Find the start row index based on your condition\nlet startIndex = -1;\n\nfor (let i = 0; i < items.length; i++) {\n  const col2 = items[i].json.col_2;\n\n  if (/^\\d{4}-\\d{4}$/.test(col2)) {\n  const value = Number(col2.split('-')[0]); // Get the first 4 digits before \"-\"\n  if (value >= 6000) {\n    startIndex = i;\n    break; // stop at the first match\n  }\n}\n}\n\n// Step 2: Find the last row index based on the highest row_number\nconst lastRowNumber = items.reduce((maxRow, item) => {\n  const rowNumber = item?.json?.row_number;\n  return rowNumber > maxRow ? rowNumber : maxRow;\n}, 0);\n\n// Step 3: Find the index of the last row in the items array\nconst lastIndex = items.findIndex(item => item.json.row_number === lastRowNumber);\n\n// Step 4: Return the slice from startIndex to lastIndex (inclusive)\nif (startIndex >= 0 && lastIndex >= startIndex) {\n  return items.slice(startIndex, lastIndex + 1);\n} else {\n  return []; // no match found or invalid range\n}\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        280
+      ],
+      "id": "2735e6d2-295e-4327-a5f9-905fc23f0759",
+      "name": "Get rows of 6000+"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7cf18916-f84c-4501-a48a-5951b51b6053",
+              "leftValue": "={{ Number($json.col_18.trim()) }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "number",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        660,
+        380
+      ],
+      "id": "1d197af0-6e73-4c90-8a70-324e3705b33f",
+      "name": "Get with values only"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('CheckRegister Convert to Google Sheet').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        660,
+        600
+      ],
+      "id": "3ec4a105-802f-4ec9-82f6-0440ba352e55",
+      "name": "Get Check Reg",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec893437-f293-4424-83c5-5e873f258f73",
+              "name": "col_17",
+              "value": "={{ Number($json.col_17.toFixed(2)) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        600
+      ],
+      "id": "687519ec-d2c8-4f01-aab1-cbae1b5ec0a0",
+      "name": "Check Reg alter"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('GL Convert to Google Sheet').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        220,
+        280
+      ],
+      "id": "3966bde0-f6e2-44bc-9e1f-a8790e8c55f5",
+      "name": "Get GL",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const currentRows = $input.all();\nconst checkRegRows = $items('Check Reg alter');\n\nconst filledRows = currentRows.map(item => {\n  const data = { ...item.json };\n\n  const targetCol12 = data.col_12 || data.col_16;\n\n  const fillFromCheckReg = (colName) => {\n    if (!data[colName]) {\n      const matchIndex = checkRegRows.findIndex(r => r.json.col_12 === targetCol12);\n      if (matchIndex !== -1) {\n        for (let i = matchIndex; i >= 0; i--) {\n          const candidate = checkRegRows[i].json;\n          if (candidate[colName] && candidate[colName] !== '') {\n            data[colName] = candidate[colName];\n            break;\n          }\n        }\n      }\n    }\n  };\n\n  // Fill the needed columns\n  ['col_6', 'col_3', 'col_1', 'col_15'].forEach(fillFromCheckReg);\n\n  return { json: data };\n});\n\nreturn filledRows;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        440
+      ],
+      "id": "c393a85b-2884-4116-91d9-c13a54b8281e",
+      "name": "Fill blank Cells"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "9e557b3f-b035-487d-8f46-16c6a7158477",
+              "leftValue": "={{ $json.col_15 }}",
+              "rightValue": "^\\d{2}/\\d{2}/\\d{4}$",
+              "operator": {
+                "type": "string",
+                "operation": "regex"
+              }
+            },
+            {
+              "id": "099b0d2c-35fe-4e6b-a707-8ac24312609e",
+              "leftValue": "={{ $json.col_16 }}",
+              "rightValue": "loan",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            },
+            {
+              "id": "b140392d-ec1b-4d5a-8ab8-5b78d1dc2831",
+              "leftValue": "={{ String($json.col_16) }}",
+              "rightValue": "={{ \"0\" }}",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.2,
+      "position": [
+        1760,
+        440
+      ],
+      "id": "f00d60fb-b22d-484b-9993-7a4ae42e8fcd",
+      "name": "Duplicate Filter"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT \n  input1.*, \n  input2.*\nFROM input1\nLEFT JOIN input2\n  ON input1.col_18 = input2.col_17\nORDER BY input1.row_number;\n"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1100,
+        440
+      ],
+      "id": "5383103a-9208-4c3f-b2c6-87c7aa043a66",
+      "name": "Compare Values"
+    },
+    {
+      "parameters": {
+        "jsCode": "const seen = new Set();\nconst uniqueRows = [];\n\n$input.all().forEach(item => {\n  const key = [\n    item.json.col_1,\n    item.json.col_4,\n    item.json.col_6,\n    item.json.col_12, // ✅ added here\n    item.json.col_15,\n    item.json.col_17,\n    item.json.col_18\n  ].join('|');\n\n  if (!seen.has(key)) {\n    seen.add(key);\n    uniqueRows.push(item);\n  }\n});\n\nreturn uniqueRows;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1540,
+        440
+      ],
+      "id": "40649620-7c9a-4aa7-bbaa-cbc5f47faea7",
+      "name": "Duplicate Checker Last Row"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n  const json = item.json;\n\n  const isJE = json.col_13 === \"JE\";\n  const isAP = json.col_13 === \"AP\";\n\n  // Convert col_3 (MM/DD/YYYY) to Month Year (e.g., \"March 2025\")\n  const date = new Date(json.col_3);\n  const monthYear = date instanceof Date && !isNaN(date) \n    ? date.toLocaleString('default', { month: 'long', year: 'numeric' })\n    : \"\"; // Fallback to empty string if the date is invalid\n\n  return {\n    json: {\n      row_number: json.row_number,\n      col_1: isJE ? \"Mortgage\" : json.col_6,\n      col_2: isJE ? \"\" : json.col_3,\n      col_3: json.col_15 || \"\",\n      col_4: isJE ? \"\" : json.col_1,\n      col_5: json.col_17 || json.col_18 || \"\",\n      col_6: json.col_12 || json.col_16 || \"\",\n      col_7: monthYear // New column with the formatted date\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1980,
+        440
+      ],
+      "id": "e0ecbf14-98ba-483b-83d7-34a67d16d30c",
+      "name": "Cleanup"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT\n    -- Update col_1 based on conditions\n    CASE\n        WHEN (input1.col_1 IS NULL OR input1.col_1 = '')\n          AND (input1.col_2 IS NULL OR input1.col_2 = '')\n          AND (input1.col_3 IS NULL OR input1.col_3 = '')\n          AND (input1.col_4 IS NULL OR input1.col_4 = '') THEN input2.col_6\n        ELSE input1.col_1\n    END AS col_1,\n    -- Update col_2 based on conditions\n    CASE\n        WHEN (input1.col_1 IS NULL OR input1.col_1 = '')\n          AND (input1.col_2 IS NULL OR input1.col_2 = '')\n          AND (input1.col_3 IS NULL OR input1.col_3 = '')\n          AND (input1.col_4 IS NULL OR input1.col_4 = '') THEN input2.col_3\n        ELSE input1.col_2\n    END AS col_2,\n    -- Update col_3 based on conditions\n    CASE\n        WHEN (input1.col_1 IS NULL OR input1.col_1 = '')\n          AND (input1.col_2 IS NULL OR input1.col_2 = '')\n          AND (input1.col_3 IS NULL OR input1.col_3 = '')\n          AND (input1.col_4 IS NULL OR input1.col_4 = '') THEN input2.col_15\n        ELSE input1.col_3\n    END AS col_3,\n    -- Update col_4 based on conditions\n    CASE\n        WHEN (input1.col_1 IS NULL OR input1.col_1 = '')\n          AND (input1.col_2 IS NULL OR input1.col_2 = '')\n          AND (input1.col_3 IS NULL OR input1.col_3 = '')\n          AND (input1.col_4 IS NULL OR input1.col_4 = '') THEN input2.col_1\n        ELSE input1.col_4\n    END AS col_4,\n    -- Keep col_5 and col_6 unchanged\n    input1.col_5,\n    input1.col_6\nFROM\n    input1\nLEFT JOIN\n    input2\nON\n    input1.col_6 = input2.col_12;"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2200,
+        500
+      ],
+      "id": "ca15feac-77c8-405c-b6be-1019431308d7",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"sheetName\": \"Sheet1\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        0,
+        280
+      ],
+      "id": "fb940150-bfcf-4152-a145-29de53ae89b4",
+      "name": "Sheet Name"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "TNM Automation Expenses",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1120,
+        -1240
+      ],
+      "id": "f46e75cf-7d1d-47a0-a55b-f4ac83048274",
+      "name": "Access TNM Automation Folder",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -920,
+        -1240
+      ],
+      "id": "b11b6d45-760c-47bd-ac42-c369faf6ba06",
+      "name": "Access Folders Inside",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=General Ledger",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -680,
+        -1240
+      ],
+      "id": "e0d2ffb3-fadc-4e96-ad4b-945f7ebacb97",
+      "name": "Access GL Folder",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Check Register",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -360,
+        -1240
+      ],
+      "id": "79ec90a1-38d4-4c2b-87a2-7da196354b92",
+      "name": "Access Check Reg Folder",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $('Get Info to send Email').item.json.TNM_SheetName }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Get Info to send Email').item.json.TNM_folderID[0] }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4780,
+        200
+      ],
+      "id": "2c3a8293-c0dc-4e56-a791-53e9001d9a6c",
+      "name": "Access TNM Sheet",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"sheetName\": \"2 - Expenses\",\n  \"Invoices\" : \"3 - AR - Invoices\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        160,
+        0
+      ],
+      "id": "f0475cc8-d325-458d-986a-70ed550160e5",
+      "name": "Sheet Name for TNM"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet lastAccountNumber = null;\nlet lastAccountTitle = null;\n\nconst newItems = [];\n\nfor (const item of items) {\n  const col2 = item.json.col_2;\n  const col5 = item.json.col_5;\n  const col18 = item.json.col_18;\n\n  if (/^\\d{4}-\\d{4}$/.test(col2)) {\n    lastAccountNumber = col2.slice(0, 4);\n    lastAccountTitle = col5 || '';\n  }\n\n  if (col18 && !/^\\d{4}-\\d{4}$/.test(col2)) {\n    // Add two new columns\n    item.json.accountNumber = lastAccountNumber;\n    item.json.accountTitle = lastAccountTitle;\n  }\n  item.json.appfolioGL;\n\n  newItems.push(item);\n}\n\nreturn newItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        200
+      ],
+      "id": "c58402f8-d6ca-4aba-b00c-e425013df20c",
+      "name": "Acc Num and Acc Title"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the input data from previous node\nconst items = $input.all();\n\n// Iterate through each item (row) and remove columns with all empty values\nconst cleanedItems = items.map(item => {\n  // Filter out keys with empty values (null, undefined, or empty string)\n  const cleanedItem = Object.fromEntries(\n    Object.entries(item.json).filter(([key, value]) => value !== null && value !== undefined && value !== \"\")\n  );\n  return { json: cleanedItem };\n});\n\n// Return the cleaned items\nreturn cleanedItems;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        200
+      ],
+      "id": "e47f38c2-a1fd-419f-a37a-b615200d0386",
+      "name": "Remove empty columns"
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT DISTINCT\n  input2.*, \n  input1.accountNumber AS accountNum, \n  input1.accountTitle AS accountTitle,\n  input1.GLaccount AS GL\n  \nFROM \n  input2\nLEFT JOIN \n  input1\nON \n  input1.col_18 = input2.col_5;\n"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        2860,
+        300
+      ],
+      "id": "2a0f11cd-7295-4205-8626-b691c48a05c0",
+      "name": "Merge to Get Acc Num and Title"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"SheetName\": \"0 - Vendor\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1060,
+        0
+      ],
+      "id": "944e005b-7ccb-40e2-8874-82fafbc85b39",
+      "name": "Get 0 - Vendor",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.sheetData.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.vendorData.SheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1540,
+        0
+      ],
+      "id": "c909578d-dda1-41bb-9055-dae552f18868",
+      "name": "Read TNM \"0 - Vendor\" Sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combineBySql",
+        "query": "SELECT\n  input2.*,\n  COALESCE(\n    (SELECT input1.[Appfolio GL Account]\n     FROM input1\n     WHERE LOWER(TRIM(input1.[Accounting Title])) LIKE CONCAT('%', LOWER(TRIM(input2.accountTitle)), '%') \n     LIMIT 1), '') AS GLaccount\nFROM input2\n"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        1760,
+        100
+      ],
+      "id": "bb08effb-f873-4f14-b140-a0035c0c5880",
+      "name": "Get Appfolio GL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const GetGoogleSheet = $items('TNM Convert to Google Sheet')[0];\nconst SheetName = $items('Sheet Name for TNM')[0];\nconst FinalValues = $items('Fix order');\n\nconst cisInfo = $items('Create/Get CIS Ref')[0]?.json || {};\nconst lastCIS = cisInfo.lastCISRef || '';\nconst propertyCode = cisInfo.PropertyCode || '0000';  // Now directly using property code\n\n// Extract numeric sequence from lastCIS (format: C-0000-250001)\nlet sequence = 0;\nconst match = lastCIS.match(/C-\\d{4}-\\d{2}(\\d{4})/);\nif (match) {\n  sequence = parseInt(match[1], 10); // DO NOT increment yet\n}\n\n// Get current year last two digits\nconst year = new Date().getFullYear().toString().slice(-2);\n\n// Loop over all final items and assign new CISRef\nconst output = FinalValues.map((item, index) => {\n  const data = { ...item.json };\n\n  // Convert col_5 to number if present\n  if (data.col_5 !== undefined && data.col_5 !== null && data.col_5 !== '') {\n    data.col_5 = Number(data.col_5);\n  }\n\n  const currentSeq = (sequence + 1 + index).toString().padStart(4, '0');\n  const CISRef = `C-${propertyCode}-${year}${currentSeq}`;\n\n  return {\n    json: {\n      GoogleSheetInfo: GetGoogleSheet.json,\n      SheetName: SheetName.json,\n      values: data,\n      CISRef: CISRef\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3300,
+        300
+      ],
+      "id": "a9d6450d-293d-4713-8061-7bb74a634bfd",
+      "name": "Call Nodes"
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  // Get the date from col_2\n  const date = item.json.col_2;\n  \n  if (date) {\n    // Split the date into month, day, and year\n    const [month, , year] = date.split('/');\n\n    // Map the month number to the month name\n    const months = [\n      \"January\", \"February\", \"March\", \"April\", \"May\", \"June\", \n      \"July\", \"August\", \"September\", \"October\", \"November\", \"December\"\n    ];\n    const monthName = months[parseInt(month, 10) - 1];\n\n    // Set the MonthYear property in the JSON\n    item.json.MonthYear = `${monthName} ${year}`;\n  } else {\n    // If there's no date in col_2, set MonthYear to empty\n    item.json.MonthYear = '';\n  }\n}\n\nreturn $input.all();\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2420,
+        500
+      ],
+      "id": "043fea44-cff2-4f66-906a-766dada298fc",
+      "name": "Code Month Year"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ec893437-f293-4424-83c5-5e873f258f73",
+              "name": "col_18",
+              "value": "={{ Number($json.col_18.toFixed(2)) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        880,
+        380
+      ],
+      "id": "2205976c-4160-41a6-9fd5-c7c513e08eaf",
+      "name": "GL alter"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "UNREAD"
+          ]
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.gmailTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -40,
+        -1220
+      ],
+      "id": "4bf659f4-7ac0-4d86-8f67-3423671fe8af",
+      "name": "Gmail Trigger",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y5ClZofIrCHa8JMz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('TNM Convert to Google Sheet').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheetName }}",
+          "mode": "name"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        440,
+        0
+      ],
+      "id": "bcc6e31c-afab-4d94-9c63-4e3b2964ddb2",
+      "name": "Read TNM \"2 - Expenses\" Sheet",
+      "alwaysOutputData": true,
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $items('Read TNM \"2 - Expenses\" Sheet');\nconst sheetInfo = $items('TNM Convert to Google Sheet')[0]?.json || {};\nconst fileName = sheetInfo.name || '';\n\n// Extract property number using regex from format \"TNM - 0034 - Name -_Working File\"\nconst propertyNumMatch = fileName.match(/TNM\\s*-\\s*(\\d{4})\\s*-/);\nconst propertyCode = propertyNumMatch ? propertyNumMatch[1] : '0000';\n\n// Extract property name from the file name (e.g., \"Almeda\" or \"Almeda Depot\")\nconst propertyNameMatch = fileName.match(/-\\s*\\d{4}\\s*-\\s*(.*?)\\s*-\\s*_?Working File/i);\nconst property = propertyNameMatch ? propertyNameMatch[1].trim() : 'Unknown';\n\n// Find the latest valid CIS Ref from all rows\nlet lastCIS = '';\nlet lastSequence = 0;\n\nfor (const row of rows) {\n  const ref = row.json[\"CIS Ref\"];\n  const match = ref && ref.match(/C-\\d{4}-\\d{2}(\\d{4})/);\n  if (match) {\n    const seq = parseInt(match[1], 10);\n    if (seq > lastSequence) {\n      lastSequence = seq;\n      lastCIS = ref;\n    }\n  }\n}\n\n// Return data\nreturn [\n  {\n    json: {\n      lastCISRef: lastCIS,\n      lastSequence: lastSequence,\n      Property: property,\n      PropertyCode: propertyCode\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ],
+      "id": "050312d9-41ea-41dd-95e9-1984fcd50717",
+      "name": "Create/Get CIS Ref"
+    },
+    {
+      "parameters": {
+        "jsCode": "const GetVendor = $items('Get 0 - Vendor')[0];\nconst AccessSheet = $items('TNM Convert to Google Sheet')[0];\n\nreturn [\n  {\n    json: {\n      vendorData: GetVendor.json,\n      sheetData: AccessSheet.json\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1320,
+        0
+      ],
+      "id": "3ac42d78-0b1e-4389-a2d8-babdd325cba5",
+      "name": "Call nodes"
+    },
+    {
+      "parameters": {
+        "jsCode": "const GetGoogleSheet = $items('Access Folders Inside');\n\nreturn GetGoogleSheet\n  .filter(item => JSON.stringify(item.json).includes('Bulk Vendor Bill'))\n  .map(item => ({\n    json: {\n      File: item.json\n    }\n  }));\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        920,
+        -1680
+      ],
+      "id": "9d37fa5a-cac7-4d9d-8600-07ecdff5c63f",
+      "name": "Access Bulk Vendor",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.File.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        1120,
+        -1860
+      ],
+      "id": "823da537-c48f-4da9-9439-55fe670c2504",
+      "name": "Get Bulk Sheet Info",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $('Copy Template').item.json.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $('Get Bulk Vendor Template').item.json.name }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Vendor Payee Name*": "={{ $json.values['Supplier / Customer'] }}",
+            "Amount*": "={{ $json.values.Amount }}",
+            "Bill Account*": "={{ $json.values['Appfolio GL Account'] }}",
+            "Bill Date*": "={{ $json.values['Invoice Date'] }}",
+            "Due Date*": "={{ $json.values['Invoice Date'] }}",
+            "Posting Date*": "={{ $json.values['Check Date'] }}",
+            "Bill Reference": "={{ $json.values['CIS Ref'] }}",
+            "Bill Remarks": "={{ $json.values['Account Title'] }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Bill Property Code*",
+              "displayName": "Bill Property Code*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill Unit Name",
+              "displayName": "Bill Unit Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Vendor Payee Name*",
+              "displayName": "Vendor Payee Name*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Amount*",
+              "displayName": "Amount*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill Account*",
+              "displayName": "Bill Account*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill Date*",
+              "displayName": "Bill Date*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Due Date*",
+              "displayName": "Due Date*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Posting Date*",
+              "displayName": "Posting Date*",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill Reference",
+              "displayName": "Bill Reference",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Bill Remarks",
+              "displayName": "Bill Remarks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Memo For Check",
+              "displayName": "Memo For Check",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Purchase Order Number",
+              "displayName": "Purchase Order Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        4320,
+        300
+      ],
+      "id": "ce965efb-7f0d-47d9-9195-f2ab73081f86",
+      "name": "Add to Bulk Vendor Bill Upload",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {
+          "fileName": "Bulk Vendor Bill.csv"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        1760,
+        -1580
+      ],
+      "id": "c2707d0f-5c3f-4407-897e-4f23ad2ccd98",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.GoogleSheetInfo.id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.SheetName.sheetName }}",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Supplier / Customer": "={{ $json.values.col_1 }}",
+            "Check Date": "={{ $json.values.col_2 }}",
+            "Invoice Date": "={{ $json.values.col_3 }}",
+            "Account Number": "={{ $json.values.accountNum }}",
+            "Appfolio GL Account": "={{ $json.values.GL }}",
+            "Check Number": "={{ $json.values.col_4 }}",
+            "Amount": "={{ $json.values.col_5 }}",
+            "   Month": "={{ $json.values.MonthYear }}",
+            "Account Title": "={{ $json.values.accountTitle }}",
+            "CIS Ref": "={{ $json.CISRef }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "CIS Ref",
+              "displayName": "CIS Ref",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Encoded",
+              "displayName": "Encoded",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Approved",
+              "displayName": "Approved",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Payment",
+              "displayName": "Payment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Supplier / Customer",
+              "displayName": "Supplier / Customer",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check Date",
+              "displayName": "Check Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Invoice Date",
+              "displayName": "Invoice Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Invoice No.",
+              "displayName": "Invoice No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "   Month",
+              "displayName": "   Month",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Account",
+              "displayName": "Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Account Number",
+              "displayName": "Account Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Appfolio GL Account",
+              "displayName": "Appfolio GL Account",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Account Title",
+              "displayName": "Account Title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Description",
+              "displayName": "Description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Check Number",
+              "displayName": "Check Number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Amount",
+              "displayName": "Amount",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Bank",
+              "displayName": "Bank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        3520,
+        300
+      ],
+      "id": "92773b56-8971-475f-8c74-6a2da06419c0",
+      "name": "Add 2 - Expenses TNM Sheet",
+      "executeOnce": false,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const GetGoogleSheet = $items('Copy Template')[0];\nconst SheetName = $items('Sheet Name for TNM')[0];\nconst FinalValues = $items('Add 2 - Expenses TNM Sheet');\n\n// Use CIS Info from previous node\nconst cisInfo = $items('Create/Get CIS Ref')[0]?.json || {};\nconst lastCIS = cisInfo.lastCISRef || '';\nconst propertyCode = cisInfo.PropertyCode || '0000';\n\n// Extract sequence number\nlet sequence = 0;\nconst match = lastCIS.match(/C-\\d{4}-\\d{2}(\\d{4})/);\nif (match) {\n  sequence = parseInt(match[1], 10);\n}\n\nconst year = new Date().getFullYear().toString().slice(-2);\n\nlet lastKnownMonth = ''; // To store the previous non-empty month\n\nconst output = FinalValues.map((item, index) => {\n  const data = { ...item.json };\n  const supplier = (data[\"Supplier / Customer\"] || \"\").toLowerCase();\n\n  // Detect and normalize the month column (accounting for odd spacing)\n  const monthKey = Object.keys(data).find(k => k.trim().toLowerCase() === \"month\" || k.trim() === \"month\");\n  const currentMonth = monthKey && data[monthKey] ? data[monthKey].toString().trim() : \"\";\n\n  // Update last known valid month\n  if (currentMonth) {\n    lastKnownMonth = currentMonth;\n  }\n\n  // Special handling for Mortgage\n  if (supplier === \"mortgage\") {\n    const useMonth = lastKnownMonth || \"Unknown Month\";\n    data[\"Account Title\"] = `Mortgage - ${useMonth}`;\n    data[\" Month\"] = useMonth; // Consistency\n  }\n\n  // Format Amount to 2 decimals\n  let rawAmount = data[\"Amount\"];\n  if (rawAmount !== undefined && rawAmount !== null && rawAmount !== \"\") {\n    const parsed = parseFloat(String(rawAmount).replace(/[^0-9.-]+/g, ''));\n    data[\"Amount\"] = isNaN(parsed) ? 0 : parseFloat(parsed.toFixed(2));\n  }\n\n  // Generate CIS Ref\n  const currentSeq = (sequence + 1 + index).toString().padStart(4, '0');\n  const CISRef = `C-${propertyCode}-${year}${currentSeq}`;\n\n  return {\n    json: {\n      GoogleSheetInfo: GetGoogleSheet.json,\n      SheetName: SheetName.json,\n      values: data,\n      CISRef: CISRef\n    }\n  };\n});\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4140,
+        300
+      ],
+      "id": "2eb46603-d3c8-4c43-a34f-f41c95a116d1",
+      "name": "Call Nodes for Bulk"
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "TNM Automation Expenses",
+        "filter": {},
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5900,
+        300
+      ],
+      "id": "382f05c3-61ed-4495-a88a-17fff0c7c05f",
+      "name": "Access TNM Automation Folder1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "folders"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6120,
+        300
+      ],
+      "id": "e55a7490-425c-4951-9bdf-f03f1836b14a",
+      "name": "Access Folders Inside1",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=General Ledger",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        -20
+      ],
+      "id": "50dd58e5-d2f4-4ed7-8cb7-09e0bab40a5c",
+      "name": "Access GL Folder1",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Check Register",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        380
+      ],
+      "id": "56da7852-49fe-4b3d-afa8-9388f8569554",
+      "name": "Access Check Reg Folder1",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "TNM",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $('Access Folders Inside1').item.json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files",
+          "fileTypes": []
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        -180
+      ],
+      "id": "9bab7573-3d87-49aa-a7c9-ae802efea1e4",
+      "name": "Access TNM Sheet1",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteFile",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6540,
+        300
+      ],
+      "id": "67cce48d-1db7-406e-b8e4-1131f270c3e5",
+      "name": "Delete Files",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const fillRows = $items('GL alter');\nconst mergedRows = $items('Merge to Get Acc Num and Title');\n\nconst mergedMap = new Map();\nmergedRows.forEach(row => {\n  const key = `${row.json.col_5}|${row.json.col_6}`;\n  mergedMap.set(key, row.json);\n});\n\nconst result = [];\nconst mortgageRows = [];\nconst matchedKeys = new Set();\n\n// Add mergedRows items in order of fillRows keys, but only once each\nfillRows.forEach(row => {\n  const key = `${row.json.col_18}|${row.json.col_16}`;\n  const matched = mergedMap.get(key);\n  if (matched && !matchedKeys.has(key)) {\n    if (matched.col_1 && matched.col_1.toLowerCase().includes('mortgage')) {\n      mortgageRows.push({ json: matched });\n    } else {\n      result.push({ json: matched });\n    }\n    matchedKeys.add(key);\n  }\n});\n\n// Add unmatched mergedRows at the end (excluding mortgage)\nmergedRows.forEach(row => {\n  const key = `${row.json.col_5}|${row.json.col_6}`;\n  if (!matchedKeys.has(key)) {\n    if (row.json.col_1 && row.json.col_1.toLowerCase().includes('mortgage')) {\n      mortgageRows.push({ json: row.json });\n    } else {\n      result.push({ json: row.json });\n    }\n    matchedKeys.add(key);\n  }\n});\n\n// Append mortgage-related rows at the very end\nresult.push(...mortgageRows);\n\nreturn result;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3080,
+        300
+      ],
+      "id": "f60b6200-a56f-4210-871b-2cd1e19854c5",
+      "name": "Fix order"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=TNM_Working_File",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1L6wH-NP69XO6vVTnMHE5Fjelryi3mw3m",
+          "mode": "list",
+          "cachedResultName": "TNM Sheet",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1L6wH-NP69XO6vVTnMHE5Fjelryi3mw3m"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -460,
+        20
+      ],
+      "id": "50d6db69-bc28-47a9-b0db-966a21b4ce21",
+      "name": "Upload TNM Working File",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"convert\": true,\n  \"mimeType\": \"application/vnd.google-apps.spreadsheet\",\n  \"parents\": [\"{{ $json.parents[0] }}\"]\n}\n",
+        "options": {}
+      },
+      "id": "029090f3-1c20-4210-b83a-cd0bc1c23f97",
+      "name": "TNM Convert to Google Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        20
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "JFXAc597zkhcREsM",
+          "name": "Google account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"convert\": true,\n  \"mimeType\": \"application/vnd.google-apps.spreadsheet\",\n  \"parents\": [\"{{ $json.parents[0] }}\"]\n}\n",
+        "options": {}
+      },
+      "id": "c848606b-2073-4d3e-a064-9c104bd733da",
+      "name": "CheckRegister Convert to Google Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        640
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "JFXAc597zkhcREsM",
+          "name": "Google account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://www.googleapis.com/drive/v3/files/{{ $json.id }}/copy",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googleOAuth2Api",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"convert\": true,\n  \"mimeType\": \"application/vnd.google-apps.spreadsheet\",\n  \"parents\": [\"{{ $json.parents[0] }}\"]\n}\n",
+        "options": {}
+      },
+      "id": "2ef6e824-7cae-41e9-b573-e9521a0e1eba",
+      "name": "GL Convert to Google Sheet",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -220,
+        300
+      ],
+      "credentials": {
+        "googleOAuth2Api": {
+          "id": "JFXAc597zkhcREsM",
+          "name": "Google account"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "Check_Register",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1LZeH2l2wRIVs4l1ljO6r8MQh0pxAYMor",
+          "mode": "list",
+          "cachedResultName": "Check Register",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1LZeH2l2wRIVs4l1ljO6r8MQh0pxAYMor"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -460,
+        640
+      ],
+      "id": "00e7c07c-8552-4a02-8dce-9e2584e616d7",
+      "name": "Upload Check Register",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "General_Ledger",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "15zVp7t8AvDEc2MsqyHCYkRcDHnGJBkkE",
+          "mode": "list",
+          "cachedResultName": "General Ledger",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/15zVp7t8AvDEc2MsqyHCYkRcDHnGJBkkE"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -460,
+        300
+      ],
+      "id": "da664e89-eda4-4cf8-a8ed-2bfad35c2dfa",
+      "name": "Upload GL",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "formTitle": "TNM Expenses Automation for CC Management",
+        "formDescription": "Please upload the correct files.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "General Ledger",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Check Register",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "TNM Working File",
+              "fieldType": "file",
+              "multipleFiles": false,
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -820,
+        300
+      ],
+      "id": "b71b3471-882d-4671-aee9-dffec40b57e4",
+      "name": "On form submission",
+      "webhookId": "7781e5e2-0732-42d5-abdd-2e1b34719fdb"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "{\n  \"sheetName\": \"Sheet1\"\n}\n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        200,
+        600
+      ],
+      "id": "32feceec-6a0c-430b-abd4-867eb018745a",
+      "name": "Sheet Name1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get data from the relevant nodes\nconst uploadNode = $items('Upload TNM Working File')[0];\nconst convertNode = $items('TNM Convert to Google Sheet')[0];\nconst Bulk = $items('Call Nodes for Bulk')[0];\n\n// Extract required values\nconst parents = uploadNode.json.parents;\nconst name = convertNode.json.name;\nconst id = convertNode.json.id;\nconst BV = Bulk.json.GoogleSheetInfo.name;\n\n// Return combined data\nreturn [\n  {\n    json: {\n      TNM_SheetName: name,\n      TNM_folderID: parents,\n      TNM_ID: id,\n      Bulk_name: BV\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4500,
+        300
+      ],
+      "id": "698ca6b8-6f06-4798-a329-a8149cd6aaa8",
+      "name": "Get Info to send Email",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "={{ $json.sheet_id }}",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "={{ $json.sheet_name }}",
+          "mode": "name"
+        },
+        "startIndex": "={{ $json.first_row_number }}",
+        "numberToDelete": "={{ $json.total_items }}"
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        1080,
+        -180
+      ],
+      "id": "7dd7444e-6c13-4c5e-9981-68a2d87c347b",
+      "name": "Delete Empty Rows",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "Gdf2yej7vl760LRd",
+          "name": "Help Google Sheet Cred"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get all values (array of objects) from the specified node\nconst allRows = $items(\"Read TNM \\\"2 - Expenses\\\" Sheet\");\n\nconst amountColumnName = \"Amount\";\nconst output = [];\n\nfor (let i = 0; i < allRows.length; i++) {\n  const row = allRows[i].json;\n\n  const amountValue = row[amountColumnName];\n  const isAmountEmpty = amountValue === null || amountValue === undefined || amountValue.toString().trim() === '';\n\n  const areOthersNotEmpty = Object.entries(row).some(([key, value]) => {\n    if (key === amountColumnName || key === \"row_number\") return false;\n    return value !== null && value !== undefined && value.toString().trim() !== '';\n  });\n\n  if (isAmountEmpty && areOthersNotEmpty) {\n    output.push({\n      json: {\n        row_number: row.row_number\n      }\n    });\n  }\n}\n\nreturn output;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        660,
+        -180
+      ],
+      "id": "40749f7a-fdb8-4593-a59d-e92219d2785b",
+      "name": "Get Empty Rows"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all(); // from previous node\n\n// Get first item from each referenced node\nconst sheetNameNode = $items('Sheet Name for TNM')[0];\nconst sheetIdNode = $items('TNM Convert to Google Sheet')[0];\n\n// Access json directly from the node items\nconst sheetName = sheetNameNode?.json?.sheetName || null;\nconst sheetId = sheetIdNode?.json?.id || null;\n\nconst total = items.length;\nconst firstRowNumber = items[0]?.json?.row_number || null;\n\nreturn [\n  {\n    json: {\n      total_items: total,\n      first_row_number: firstRowNumber,\n      sheet_name: sheetName,\n      sheet_id: sheetId\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        860,
+        -180
+      ],
+      "id": "a5f32501-b5a1-4b43-8994-6cad171cc6e9",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "={{ $json.name }}",
+          "googleFileConversion": {
+            "conversion": {
+              "sheetsToFormat": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            }
+          },
+          "fileName": "={{ $json.name }}.xlsx"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5020,
+        200
+      ],
+      "id": "0872cd90-098d-4d17-bb79-68bad53f66a8",
+      "name": "Download Sheet",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "ods",
+        "binaryPropertyName": "test",
+        "options": {
+          "fileName": "asdasdaasd"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        340,
+        -1180
+      ],
+      "id": "d9d257c8-8c47-414f-9e2f-bc9363c09bae",
+      "name": "Sheet to Excel"
+    },
+    {
+      "parameters": {
+        "sendTo": "focus@crowdsourcesolutions.ph",
+        "subject": "=Expenses Automation - {{ $('Download Sheet').item.json.name }}",
+        "emailType": "text",
+        "message": "=Hi,\n\nThis is the Output of n8n CC Management Automation\n\nThe Name of the Working File is:\n{{ $json.name }}\n\nOpen using Excel. Thank you",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "={{ $('Download Sheet').item.json.name }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        5240,
+        200
+      ],
+      "id": "6eaef63c-c144-4bd3-a164-1db97dc54e7d",
+      "name": "Gmail",
+      "webhookId": "e9147c93-f227-4ead-a6fb-045e0ad15f09",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y5ClZofIrCHa8JMz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 10
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        5680,
+        300
+      ],
+      "id": "09706660-fc46-488c-8f9b-9d18f4004923",
+      "name": "Wait",
+      "webhookId": "23a8e053-af3f-4c12-b305-952e92ae0350",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1DNbGu7QQguE8ui-UFKow1L4A0QelraAK",
+            "mode": "list",
+            "cachedResultName": "Bulk Vendor Template",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1DNbGu7QQguE8ui-UFKow1L4A0QelraAK"
+          },
+          "whatToSearch": "all",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3740,
+        300
+      ],
+      "id": "624eac45-a20c-48ff-a998-d3d14b7fc054",
+      "name": "Get Bulk Vendor Template",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "copy",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "name": "={{ $('Call Nodes').item.json.GoogleSheetInfo.name }} Bulk Vendor",
+        "sameFolder": false,
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1gJhFouSZprUtkg8Af81A5qlPPWDqyAUa",
+          "mode": "list",
+          "cachedResultName": "Bulk Vendor File",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1gJhFouSZprUtkg8Af81A5qlPPWDqyAUa"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3940,
+        300
+      ],
+      "id": "1b2bf408-5e5e-4841-8b0c-a684293cbadf",
+      "name": "Copy Template",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "={{ $json.Bulk_name }}",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "1gJhFouSZprUtkg8Af81A5qlPPWDqyAUa",
+            "mode": "list",
+            "cachedResultName": "Bulk Vendor File",
+            "cachedResultUrl": "https://drive.google.com/drive/folders/1gJhFouSZprUtkg8Af81A5qlPPWDqyAUa"
+          },
+          "whatToSearch": "files",
+          "fileTypes": [
+            "application/vnd.google-apps.spreadsheet"
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        4780,
+        420
+      ],
+      "id": "5749db54-1608-49a5-aad4-279c2edb0bf4",
+      "name": "Access Bulk Vendor File",
+      "executeOnce": true,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {
+          "binaryPropertyName": "={{ $json.name }}",
+          "googleFileConversion": {
+            "conversion": {}
+          },
+          "fileName": "={{ $json.name }}.csv"
+        }
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        5020,
+        420
+      ],
+      "id": "988267f0-38bb-495e-a438-ae4822ccd2fe",
+      "name": "Download CSV",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.1,
+      "position": [
+        5440,
+        300
+      ],
+      "id": "1d97dbc0-2e13-4d7a-b34a-515d663702ed",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "sendTo": "focus@crowdsourcesolutions.ph",
+        "subject": "=Bulk Vendor CSV - {{ $json.name }}",
+        "emailType": "text",
+        "message": "=Hi,\n\nThis is the Output of n8n CC Management Automation\n\nThe Name of the CSV is:\n{{ $json.name }}\n",
+        "options": {
+          "attachmentsUi": {
+            "attachmentsBinary": [
+              {
+                "property": "={{ $json.name }}"
+              }
+            ]
+          }
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        5240,
+        420
+      ],
+      "id": "c4a4ab74-bf04-4ce3-8bcd-d351fca86495",
+      "name": "Gmail1",
+      "webhookId": "e9147c93-f227-4ead-a6fb-045e0ad15f09",
+      "executeOnce": true,
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Y5ClZofIrCHa8JMz",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "=GL",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        180
+      ],
+      "id": "63ec75c5-87b4-4f30-9a6e-20fd9a5395c5",
+      "name": "Access GL Folder2",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "Bulk",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "https://drive.google.com/drive/u/5/folders/1gJhFouSZprUtkg8Af81A5qlPPWDqyAUa",
+            "mode": "url"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        720
+      ],
+      "id": "c940adb3-547d-4dd3-bc29-122e00c4efdf",
+      "name": "Bulk Folder",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "fileFolder",
+        "queryString": "APCKREG",
+        "filter": {
+          "folderId": {
+            "__rl": true,
+            "value": "={{ $json.id }}",
+            "mode": "id"
+          },
+          "whatToSearch": "files"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        6340,
+        560
+      ],
+      "id": "8c65c389-8a8d-48f3-abda-7269bbf8a182",
+      "name": "Access Check Reg Folder2",
+      "executeOnce": false,
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "IqhWaiKi8UEmNjgt",
+          "name": "Google Drive account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get rows of 6000+": {
+      "main": [
+        [
+          {
+            "node": "Get with values only",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Acc Num and Acc Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get with values only": {
+      "main": [
+        [
+          {
+            "node": "GL alter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Check Reg": {
+      "main": [
+        [
+          {
+            "node": "Check Reg alter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Reg alter": {
+      "main": [
+        [
+          {
+            "node": "Compare Values",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get GL": {
+      "main": [
+        [
+          {
+            "node": "Get rows of 6000+",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fill blank Cells": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Checker Last Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Filter": {
+      "main": [
+        [
+          {
+            "node": "Cleanup",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compare Values": {
+      "main": [
+        [
+          {
+            "node": "Fill blank Cells",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Duplicate Checker Last Row": {
+      "main": [
+        [
+          {
+            "node": "Duplicate Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Cleanup": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Code Month Year",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet Name": {
+      "main": [
+        [
+          {
+            "node": "Get GL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access TNM Automation Folder": {
+      "main": [
+        [
+          {
+            "node": "Access Folders Inside",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Folders Inside": {
+      "main": [
+        [
+          {
+            "node": "Access GL Folder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access Check Reg Folder",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access GL Folder": {
+      "main": [
+        []
+      ]
+    },
+    "Access Check Reg Folder": {
+      "main": [
+        []
+      ]
+    },
+    "Access TNM Sheet": {
+      "main": [
+        [
+          {
+            "node": "Download Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet Name for TNM": {
+      "main": [
+        [
+          {
+            "node": "Read TNM \"2 - Expenses\" Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Acc Num and Acc Title": {
+      "main": [
+        [
+          {
+            "node": "Remove empty columns",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Remove empty columns": {
+      "main": [
+        [
+          {
+            "node": "Get Appfolio GL",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge to Get Acc Num and Title": {
+      "main": [
+        [
+          {
+            "node": "Fix order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get 0 - Vendor": {
+      "main": [
+        [
+          {
+            "node": "Call nodes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read TNM \"0 - Vendor\" Sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Appfolio GL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Appfolio GL": {
+      "main": [
+        [
+          {
+            "node": "Merge to Get Acc Num and Title",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Nodes": {
+      "main": [
+        [
+          {
+            "node": "Add 2 - Expenses TNM Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code Month Year": {
+      "main": [
+        [
+          {
+            "node": "Merge to Get Acc Num and Title",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "GL alter": {
+      "main": [
+        [
+          {
+            "node": "Compare Values",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail Trigger": {
+      "main": [
+        []
+      ]
+    },
+    "Read TNM \"2 - Expenses\" Sheet": {
+      "main": [
+        [
+          {
+            "node": "Create/Get CIS Ref",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get Empty Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create/Get CIS Ref": {
+      "main": [
+        [
+          {
+            "node": "Get 0 - Vendor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call nodes": {
+      "main": [
+        [
+          {
+            "node": "Read TNM \"0 - Vendor\" Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Bulk Vendor": {
+      "main": [
+        []
+      ]
+    },
+    "Get Bulk Sheet Info": {
+      "main": [
+        []
+      ]
+    },
+    "Add to Bulk Vendor Bill Upload": {
+      "main": [
+        [
+          {
+            "node": "Get Info to send Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add 2 - Expenses TNM Sheet": {
+      "main": [
+        [
+          {
+            "node": "Get Bulk Vendor Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call Nodes for Bulk": {
+      "main": [
+        [
+          {
+            "node": "Add to Bulk Vendor Bill Upload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access TNM Automation Folder1": {
+      "main": [
+        [
+          {
+            "node": "Access Folders Inside1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Folders Inside1": {
+      "main": [
+        [
+          {
+            "node": "Access GL Folder1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access Check Reg Folder1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access TNM Sheet1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Bulk Folder",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access Check Reg Folder2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access GL Folder2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access TNM Sheet1": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access GL Folder1": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Check Reg Folder1": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fix order": {
+      "main": [
+        [
+          {
+            "node": "Call Nodes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload TNM Working File": {
+      "main": [
+        [
+          {
+            "node": "TNM Convert to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload Check Register": {
+      "main": [
+        [
+          {
+            "node": "CheckRegister Convert to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload GL": {
+      "main": [
+        [
+          {
+            "node": "GL Convert to Google Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "Upload TNM Working File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload GL",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Upload Check Register",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CheckRegister Convert to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sheet Name1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GL Convert to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sheet Name",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TNM Convert to Google Sheet": {
+      "main": [
+        [
+          {
+            "node": "Sheet Name for TNM",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet Name1": {
+      "main": [
+        [
+          {
+            "node": "Get Check Reg",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Info to send Email": {
+      "main": [
+        [
+          {
+            "node": "Access Bulk Vendor File",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Access TNM Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Empty Rows": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Delete Empty Rows",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Sheet": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Sheet to Excel": {
+      "main": [
+        []
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Access TNM Automation Folder1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        []
+      ]
+    },
+    "Get Bulk Vendor Template": {
+      "main": [
+        [
+          {
+            "node": "Copy Template",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Copy Template": {
+      "main": [
+        [
+          {
+            "node": "Call Nodes for Bulk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Bulk Vendor File": {
+      "main": [
+        [
+          {
+            "node": "Download CSV",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download CSV": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Access GL Folder2": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bulk Folder": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Access Check Reg Folder2": {
+      "main": [
+        [
+          {
+            "node": "Delete Files",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "ca144375-04c1-4ba4-b3bc-18e3fc5b88ac",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d3a7cf79eb4a246fe933cc979694a1777c838c2b02662fe2ce3c7cfa96454a58"
+  },
+  "id": "RsFndVqOalUbpodI",
+  "tags": []
+}
